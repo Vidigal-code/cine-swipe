@@ -17,6 +17,13 @@ Este guia adiciona suporte de deploy no Railway sem perder o modo principal do p
   - `backend/railway.toml`
   - `frontend/railway.toml`
 
+### Bootstrap local do `.env` (antes do deploy)
+
+- Arquivo base versionado: `envexample.txt` (raiz do projeto).
+- Copie/renomeie para `.env` antes de validar local:
+  - `cp envexample.txt .env` (Linux/macOS)
+  - `copy envexample.txt .env` (Windows)
+
 ### Serviço backend (Railway)
 
 #### Variáveis obrigatórias
@@ -99,6 +106,13 @@ This runbook adds Railway deployment support while preserving the default projec
 - Use:
   - `backend/railway.toml`
   - `frontend/railway.toml`
+
+### Local `.env` bootstrap (before deploy)
+
+- Versioned base file: `envexample.txt` (project root).
+- Copy/rename it to `.env` before local validation:
+  - `cp envexample.txt .env` (Linux/macOS)
+  - `copy envexample.txt .env` (Windows)
 
 ### Backend service (Railway)
 

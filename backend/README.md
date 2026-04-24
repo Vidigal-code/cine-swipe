@@ -73,7 +73,8 @@ No backend em produção local:
 - Mensageria: `RABBITMQ_URL`, `RABBITMQ_PAYMENT_QUEUE`, `RABBITMQ_PAYMENT_DLQ`, `RABBITMQ_PREFETCH`.
 - Pagamento: `PAYMENT_PROVIDER`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
 - Créditos: `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_*`.
-- Referência pronta para bootstrap local: `/.env.example`.
+- Referência pronta para bootstrap local: `/envexample.txt`.
+- Para execução local, copie/renomeie `envexample.txt` para `.env` na raiz do projeto.
 
 ### Deploy Railway
 
@@ -155,7 +156,8 @@ Backend production-local bootstrap:
 - Messaging: `RABBITMQ_URL`, `RABBITMQ_PAYMENT_QUEUE`, `RABBITMQ_PAYMENT_DLQ`, `RABBITMQ_PREFETCH`.
 - Payment: `PAYMENT_PROVIDER`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
 - Credits: `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_*`.
-- Ready-to-copy bootstrap reference: `/.env.example`.
+- Ready-to-copy bootstrap reference: `/envexample.txt`.
+- For local execution, copy/rename `envexample.txt` to `.env` at project root.
 
 ### Railway deployment
 

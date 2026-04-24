@@ -27,8 +27,9 @@ O Cine-Swipe é um catálogo fullstack de filmes com separação Admin/User, arq
 ### Execução 100% local (Docker-first)
 
 1. Copie o arquivo de ambiente:
-   - `cp .env.example .env` (Linux/macOS)
-   - `copy .env.example .env` (Windows)
+   - `cp envexample.txt .env` (Linux/macOS)
+   - `copy envexample.txt .env` (Windows)
+   - (Opcional) renomeie direto: `mv envexample.txt .env` / `ren envexample.txt .env`
 2. Suba o ambiente:
    - `docker-compose up --build`
 3. Acesse:
@@ -106,8 +107,9 @@ Cine-Swipe is a fullstack movie catalog with Admin/User separation, layered arch
 ### Run 100% locally (Docker-first)
 
 1. Copy env file:
-   - `cp .env.example .env` (Linux/macOS)
-   - `copy .env.example .env` (Windows)
+   - `cp envexample.txt .env` (Linux/macOS)
+   - `copy envexample.txt .env` (Windows)
+   - (Optional) rename directly: `mv envexample.txt .env` / `ren envexample.txt .env`
 2. Start the stack:
    - `docker-compose up --build`
 3. Access:

@@ -43,6 +43,8 @@ Frontend Next.js 14 em arquitetura FSD, tema dark/light com base orange, integra
 - `NEXT_PUBLIC_API_URL` (ex.: `http://localhost:3001`).
 - `NEXT_PUBLIC_START_THEME` (padrão `dark`).
 - `START_THEME` (fallback).
+- Base de ambiente versionada na raiz: `envexample.txt`.
+- Antes de rodar, copie/renomeie `envexample.txt` para `.env` na raiz do projeto.
 
 ### Rodar local (sem Docker)
 
@@ -111,6 +113,8 @@ Next.js 14 frontend using FSD architecture, dark/light theme with orange palette
 - `NEXT_PUBLIC_API_URL` (e.g. `http://localhost:3001`).
 - `NEXT_PUBLIC_START_THEME` (default `dark`).
 - `START_THEME` (fallback).
+- Versioned environment template at root: `envexample.txt`.
+- Before running locally, copy/rename `envexample.txt` to `.env` at project root.
 
 ### Run locally (without Docker)
 
