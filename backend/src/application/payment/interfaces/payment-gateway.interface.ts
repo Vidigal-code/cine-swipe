@@ -3,6 +3,7 @@ export interface ProcessPaymentInput {
   amount: number;
   currency: string;
   correlationId: string;
+  purchaseKind?: 'movie' | 'credit';
 }
 
 export interface ProcessPaymentResult {

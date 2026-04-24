@@ -284,6 +284,27 @@ class InMemoryPurchaseRepository implements IPurchaseRepository {
     return this.toPurchase(updated);
   }
 
+  async updatePaymentResult(
+    id: string,
+    status: PurchaseStatus,
+    failureReason?: string | null,
+    stripePaymentIntentId?: string | null,
+  ): Promise<Purchase> {
+    const record = this.store.purchases.get(id);
+    if (!record) {
+      throw new Error(`Purchase ${id} not found`);
+    }
+    const updated: PurchaseRecord = {
+      ...record,
+      status,
+      failureReason: failureReason ?? null,
+      stripePaymentIntentId: stripePaymentIntentId ?? null,
+      updatedAt: new Date(),
+    };
+    this.store.purchases.set(id, updated);
+    return this.toPurchase(updated);
+  }
+
   async findByUser(userId: string): Promise<Purchase[]> {
     return [...this.store.purchases.values()]
       .filter((purchase) => purchase.userId === userId)

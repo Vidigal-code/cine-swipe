@@ -20,6 +20,7 @@ import { CHECKOUT_FAILED_EVENT } from '../../application/payment/payment.service
 import { ApiLogger } from '../../shared/logger/api-logger';
 import { readPositiveIntConfig } from '../../shared/config/env-number.util';
 import { firstValueFrom, timeout } from 'rxjs';
+import { isRmqPaymentFlow } from '../../shared/config/platform.config';
 
 const DEFAULT_DISPATCH_BATCH_SIZE = 25;
 const DEFAULT_OUTBOX_MAX_ATTEMPTS = 5;
@@ -43,6 +44,9 @@ export class PaymentOutboxDispatcher implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit(): void {
+    if (!isRmqPaymentFlow(this.configService)) {
+      return;
+    }
     const intervalMs = readPositiveIntConfig(
       this.configService,
       'PAYMENT_OUTBOX_DISPATCH_INTERVAL_MS',

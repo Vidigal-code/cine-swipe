@@ -46,6 +46,13 @@ Frontend Next.js 14 em arquitetura FSD, tema dark/light com base orange, integra
 - Base de ambiente versionada na raiz: `envexample.txt`.
 - Antes de rodar, copie/renomeie `envexample.txt` para `.env` na raiz do projeto.
 
+### Compatibilidade com modo híbrido do backend
+
+- O frontend permanece estável entre os modos `local` e `hybrid` do backend.
+- Login pode seguir por credenciais locais ou Firebase (conforme payload usado).
+- No modo `PAYMENT_FLOW_MODE=sync`, o retorno de checkout pode chegar imediatamente como `COMPLETED`/`FAILED`.
+- No modo `PAYMENT_FLOW_MODE=rmq`, o fluxo permanece assíncrono com fila + webhook.
+
 ### Rodar local (sem Docker)
 
 1. `npm install`
@@ -115,6 +122,13 @@ Next.js 14 frontend using FSD architecture, dark/light theme with orange palette
 - `START_THEME` (fallback).
 - Versioned environment template at root: `envexample.txt`.
 - Before running locally, copy/rename `envexample.txt` to `.env` at project root.
+
+### Compatibility with backend hybrid mode
+
+- Frontend remains stable across backend `local` and `hybrid` auth modes.
+- Login can use either local credentials or Firebase token (depending on request payload).
+- With `PAYMENT_FLOW_MODE=sync`, checkout may return immediate `COMPLETED`/`FAILED`.
+- With `PAYMENT_FLOW_MODE=rmq`, checkout stays asynchronous with queue + webhook.
 
 ### Run locally (without Docker)
 

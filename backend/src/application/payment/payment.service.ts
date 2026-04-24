@@ -29,6 +29,12 @@ import {
   PaymentAuditEventType,
   PaymentAuditSource,
 } from '../../domain/payment/entities/payment-audit.entity';
+import { PaymentGatewayFactory } from '../../infrastructure/payment/payment-gateway.factory';
+import { CreditService } from '../credit/credit.service';
+import { WEBHOOK_EVENT_REPOSITORY } from '../../domain/payment/interfaces/webhook-event.repository';
+import type { IWebhookEventRepository } from '../../domain/payment/interfaces/webhook-event.repository';
+import { isRmqPaymentFlow } from '../../shared/config/platform.config';
+import { CreditPurchaseStatus } from '../../domain/credit/entities/credit-purchase.entity';
 
 interface CheckoutEvent {
   purchaseId: string;
@@ -47,8 +53,6 @@ const CHECKOUT_CREATED_AUDIT_MESSAGE =
 
 @Injectable()
 export class PaymentService {
-  private readonly processedWebhookEvents = new Set<string>();
-
   constructor(
     @Inject(PURCHASE_REPOSITORY)
     private readonly purchaseRepository: IPurchaseRepository,
@@ -61,32 +65,38 @@ export class PaymentService {
     private readonly paginationService: PaginationService,
     private readonly stripeWebhookService: StripeWebhookService,
     private readonly paymentAuditService: PaymentAuditService,
+    private readonly paymentGatewayFactory: PaymentGatewayFactory,
+    private readonly creditService: CreditService,
+    @Inject(WEBHOOK_EVENT_REPOSITORY)
+    private readonly webhookEventRepository: IWebhookEventRepository,
   ) {}
 
   async checkout(userId: string, movieId: string): Promise<Purchase> {
     const movie = await this.movieService.getMovieById(movieId);
     const correlationId = randomUUID();
-    const provider = this.configService.get<string>('PAYMENT_PROVIDER', 'mock');
+    const provider = this.paymentGatewayFactory.resolveDefaultProvider();
+    const useRmqFlow = isRmqPaymentFlow(this.configService);
 
-    const purchase = await this.purchaseRepository.createWithOutbox(
-      {
-        userId,
-        movieId,
-        amount: movie.price,
-        status: PurchaseStatus.PENDING,
-        provider,
-        correlationId,
-      },
-      {
-        eventType: CHECKOUT_REQUESTED_EVENT,
-        payload: {
-          amount: movie.price,
-          provider,
-          correlationId,
-          retryCount: 0,
-        },
-      },
-    );
+    const purchaseInput = {
+      userId,
+      movieId,
+      amount: movie.price,
+      status: PurchaseStatus.PENDING,
+      provider,
+      correlationId,
+    };
+
+    const purchase = useRmqFlow
+      ? await this.purchaseRepository.createWithOutbox(purchaseInput, {
+          eventType: CHECKOUT_REQUESTED_EVENT,
+          payload: {
+            amount: movie.price,
+            provider,
+            correlationId,
+            retryCount: 0,
+          },
+        })
+      : await this.purchaseRepository.create(purchaseInput);
 
     await this.paymentAuditService.captureFromPurchase(
       purchase,
@@ -95,7 +105,11 @@ export class PaymentService {
       CHECKOUT_CREATED_AUDIT_MESSAGE,
     );
 
-    return purchase;
+    if (useRmqFlow) {
+      return purchase;
+    }
+
+    return this.processCheckoutSynchronously(purchase);
   }
 
   async requeueCheckout(
@@ -140,7 +154,7 @@ export class PaymentService {
 
   async handleStripeWebhook(rawBody: Buffer, signature: string): Promise<void> {
     const event = this.stripeWebhookService.constructEvent(rawBody, signature);
-    if (this.isWebhookEventProcessed(event.id)) {
+    if (await this.isWebhookEventProcessed(event.id)) {
       ApiLogger.debug(
         `Skipping duplicate Stripe event ${event.id}`,
         PAYMENT_LOGGER_CONTEXT,
@@ -150,7 +164,7 @@ export class PaymentService {
     }
 
     await this.processStripeEvent(event);
-    this.processedWebhookEvents.add(event.id);
+    await this.webhookEventRepository.markAsProcessed(event.id);
   }
 
   private async processStripeEvent(event: Stripe.Event): Promise<void> {
@@ -173,18 +187,27 @@ export class PaymentService {
     event: Stripe.Event,
   ): Promise<void> {
     const metadata = this.extractPaymentIntentMetadata(event);
-    const purchase = metadata.purchaseId
-      ? await this.purchaseRepository.findById(metadata.purchaseId)
-      : metadata.correlationId
-        ? await this.purchaseRepository.findByCorrelationId(
-            metadata.correlationId,
-          )
-        : null;
+    if (metadata.purchaseKind === 'credit') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await this.handleCreditPaymentSucceeded(
+        metadata.purchaseId,
+        event.id,
+        paymentIntent.id,
+      );
+      return;
+    }
+
+    const purchase = await this.findMoviePurchase(
+      metadata.purchaseId,
+      metadata.correlationId,
+    );
 
     if (!purchase) {
-      ApiLogger.warn(
-        `Stripe success webhook without matching purchase. event=${event.id}`,
-        PAYMENT_LOGGER_CONTEXT,
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await this.handleCreditPaymentSucceeded(
+        metadata.purchaseId,
+        event.id,
+        paymentIntent.id,
       );
       return;
     }
@@ -193,9 +216,12 @@ export class PaymentService {
       return;
     }
 
-    await this.updatePurchaseStatusWithAudit(
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    await this.updatePurchasePaymentResultWithAudit(
       purchase.id,
       PurchaseStatus.COMPLETED,
+      null,
+      paymentIntent.id,
       PaymentAuditSource.WEBHOOK,
       `Stripe event ${event.id} approved payment intent`,
     );
@@ -203,18 +229,31 @@ export class PaymentService {
 
   private async handlePaymentIntentFailed(event: Stripe.Event): Promise<void> {
     const metadata = this.extractPaymentIntentMetadata(event);
-    const purchase = metadata.purchaseId
-      ? await this.purchaseRepository.findById(metadata.purchaseId)
-      : metadata.correlationId
-        ? await this.purchaseRepository.findByCorrelationId(
-            metadata.correlationId,
-          )
-        : null;
+    if (metadata.purchaseKind === 'credit') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await this.handleCreditPaymentFailed(
+        metadata.purchaseId,
+        event.id,
+        paymentIntent.id,
+        paymentIntent.last_payment_error?.message ??
+          'payment_intent.payment_failed',
+      );
+      return;
+    }
+
+    const purchase = await this.findMoviePurchase(
+      metadata.purchaseId,
+      metadata.correlationId,
+    );
 
     if (!purchase) {
-      ApiLogger.warn(
-        `Stripe failed webhook without matching purchase. event=${event.id}`,
-        PAYMENT_LOGGER_CONTEXT,
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await this.handleCreditPaymentFailed(
+        metadata.purchaseId,
+        event.id,
+        paymentIntent.id,
+        paymentIntent.last_payment_error?.message ??
+          'payment_intent.payment_failed',
       );
       return;
     }
@@ -227,27 +266,34 @@ export class PaymentService {
       return;
     }
 
-    await this.updatePurchaseStatusWithAudit(
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    await this.updatePurchasePaymentResultWithAudit(
       purchase.id,
       PurchaseStatus.FAILED,
+      paymentIntent.last_payment_error?.message ??
+        'payment_intent.payment_failed',
+      paymentIntent.id,
       PaymentAuditSource.WEBHOOK,
       `Stripe event ${event.id} reported payment failure`,
     );
   }
 
   private extractPaymentIntentMetadata(event: Stripe.Event): {
-    purchaseId?: string;
+    purchaseId: string;
     correlationId?: string;
+    purchaseKind?: 'movie' | 'credit';
   } {
     const intent = event.data.object as Stripe.PaymentIntent;
     return {
-      purchaseId: intent.metadata?.purchaseId,
+      purchaseId: intent.metadata?.purchaseId ?? '',
       correlationId: intent.metadata?.correlationId,
+      purchaseKind:
+        intent.metadata?.purchaseKind === 'credit' ? 'credit' : 'movie',
     };
   }
 
-  private isWebhookEventProcessed(eventId: string): boolean {
-    return this.processedWebhookEvents.has(eventId);
+  private async isWebhookEventProcessed(eventId: string): Promise<boolean> {
+    return this.webhookEventRepository.hasBeenProcessed(eventId);
   }
 
   async updatePurchaseStatusWithAudit(
@@ -273,6 +319,33 @@ export class PaymentService {
       message,
     );
 
+    return purchase;
+  }
+
+  async updatePurchasePaymentResultWithAudit(
+    purchaseId: string,
+    status: PurchaseStatus,
+    failureReason: string | null,
+    stripePaymentIntentId: string | null,
+    source: PaymentAuditSource,
+    message?: string,
+  ): Promise<Purchase | null> {
+    const currentPurchase = await this.purchaseRepository.findById(purchaseId);
+    if (!currentPurchase) {
+      return null;
+    }
+    const purchase = await this.purchaseRepository.updatePaymentResult(
+      purchaseId,
+      status,
+      failureReason,
+      stripePaymentIntentId,
+    );
+    await this.paymentAuditService.captureFromPurchase(
+      purchase,
+      PaymentAuditEventType.STATUS_UPDATED,
+      source,
+      message,
+    );
     return purchase;
   }
 
@@ -343,6 +416,126 @@ export class PaymentService {
       PaymentAuditEventType.WEBHOOK_DUPLICATE_IGNORED,
       PaymentAuditSource.WEBHOOK,
       `Evento duplicado ignorado: ${event.id}`,
+    );
+  }
+
+  private async processCheckoutSynchronously(
+    purchase: Purchase,
+  ): Promise<Purchase> {
+    try {
+      const gateway = this.paymentGatewayFactory.resolveGateway(
+        purchase.provider,
+      );
+      const paymentResult = await gateway.processPayment({
+        purchaseId: purchase.id,
+        amount: purchase.amount,
+        correlationId: purchase.correlationId,
+        currency: this.configService.get<string>('STRIPE_CURRENCY', 'brl'),
+        purchaseKind: 'movie',
+      });
+      const status = paymentResult.approved
+        ? PurchaseStatus.COMPLETED
+        : PurchaseStatus.FAILED;
+      const reason = paymentResult.approved
+        ? null
+        : (paymentResult.failureReason ?? 'sync_payment_declined');
+      const updated = await this.updatePurchasePaymentResultWithAudit(
+        purchase.id,
+        status,
+        reason,
+        paymentResult.externalReference ?? null,
+        PaymentAuditSource.API,
+        'Pagamento processado no modo sincrono',
+      );
+      return updated ?? purchase;
+    } catch (error) {
+      await this.updatePurchasePaymentResultWithAudit(
+        purchase.id,
+        PurchaseStatus.FAILED,
+        error instanceof Error ? error.message : 'sync_payment_failed',
+        null,
+        PaymentAuditSource.API,
+        'Pagamento sincrono falhou por excecao',
+      );
+      throw error;
+    }
+  }
+
+  private async findMoviePurchase(
+    purchaseId: string,
+    correlationId?: string,
+  ): Promise<Purchase | null> {
+    if (purchaseId) {
+      const purchase = await this.purchaseRepository.findById(purchaseId);
+      if (purchase) {
+        return purchase;
+      }
+    }
+    if (!correlationId) {
+      return null;
+    }
+    return this.purchaseRepository.findByCorrelationId(correlationId);
+  }
+
+  private async handleCreditPaymentSucceeded(
+    purchaseId: string,
+    eventId: string,
+    externalReference?: string,
+  ): Promise<void> {
+    if (!purchaseId) {
+      ApiLogger.warn(
+        `Stripe success webhook without purchase id. event=${eventId}`,
+        PAYMENT_LOGGER_CONTEXT,
+      );
+      return;
+    }
+    const creditPurchase =
+      await this.creditService.markCheckoutLookup(purchaseId);
+    if (!creditPurchase) {
+      ApiLogger.warn(
+        `Stripe success webhook without matching purchase. event=${eventId}`,
+        PAYMENT_LOGGER_CONTEXT,
+      );
+      return;
+    }
+    if (creditPurchase.status === CreditPurchaseStatus.COMPLETED) {
+      return;
+    }
+    await this.creditService.markCheckoutCompleted(
+      creditPurchase.id,
+      externalReference,
+    );
+  }
+
+  private async handleCreditPaymentFailed(
+    purchaseId: string,
+    eventId: string,
+    externalReference?: string,
+    reason = 'stripe_webhook_payment_failed',
+  ): Promise<void> {
+    if (!purchaseId) {
+      ApiLogger.warn(
+        `Stripe failed webhook without purchase id. event=${eventId}`,
+        PAYMENT_LOGGER_CONTEXT,
+      );
+      return;
+    }
+    const creditPurchase =
+      await this.creditService.markCheckoutLookup(purchaseId);
+    if (!creditPurchase) {
+      ApiLogger.warn(
+        `Stripe failed webhook without matching purchase. event=${eventId}`,
+        PAYMENT_LOGGER_CONTEXT,
+      );
+      return;
+    }
+    if (creditPurchase.status === CreditPurchaseStatus.COMPLETED) {
+      return;
+    }
+    await this.creditService.markCheckoutFailed(
+      creditPurchase.id,
+      reason,
+      externalReference,
     );
   }
 

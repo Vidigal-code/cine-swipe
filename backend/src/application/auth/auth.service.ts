@@ -76,7 +76,9 @@ export class AuthService {
   ) {}
 
   async register(input: RegisterInput): Promise<AuthResult> {
-    const provider = this.authProviderService.getAuthProvider();
+    const provider = this.authProviderService.resolveAuthProviderForPayload(
+      Boolean(input.firebaseIdToken),
+    );
     const role = this.resolveRole(input.role, input.email);
     const registrationContext = await this.resolveRegistrationContext(input);
 
@@ -102,7 +104,9 @@ export class AuthService {
   }
 
   async login(input: LoginInput): Promise<AuthResult> {
-    const provider = this.authProviderService.getAuthProvider();
+    const provider = this.authProviderService.resolveAuthProviderForPayload(
+      Boolean(input.firebaseIdToken),
+    );
     const user =
       provider === 'firebase'
         ? await this.loginWithFirebase(input)

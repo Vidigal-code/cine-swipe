@@ -43,6 +43,7 @@ export class PaymentAuditService {
       provider: purchase.provider,
       status: purchase.status,
       correlationId: purchase.correlationId,
+      stripePaymentIntentId: purchase.stripePaymentIntentId,
       eventType,
       source,
       message,

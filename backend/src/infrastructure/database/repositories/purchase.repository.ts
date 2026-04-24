@@ -142,6 +142,24 @@ export class PrismaPurchaseRepository implements IPurchaseRepository {
     return this.toDomain(purchase);
   }
 
+  async updatePaymentResult(
+    id: string,
+    status: PurchaseStatus,
+    failureReason?: string | null,
+    stripePaymentIntentId?: string | null,
+  ): Promise<Purchase> {
+    const purchase = await this.prisma.purchase.update({
+      where: { id },
+      data: {
+        status,
+        failureReason: failureReason ?? null,
+        stripePaymentIntentId: stripePaymentIntentId ?? null,
+      },
+      include: PURCHASE_INCLUDE_RELATIONS,
+    });
+    return this.toDomain(purchase);
+  }
+
   async findByUser(userId: string): Promise<Purchase[]> {
     const purchases = await this.prisma.purchase.findMany({
       where: { userId },

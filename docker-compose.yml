@@ -39,7 +39,13 @@ services:
       - "3001:3001"
     command: sh -c "npm run start:prod:migrate"
     environment:
+      DATABASE_PROVIDER: ${DATABASE_PROVIDER:-postgres}
       DATABASE_URL: postgresql://cineswipe:cineswipe@database:5432/cineswipe?schema=public
+      AUTH_MODE: ${AUTH_MODE:-local}
+      AUTH_PROVIDER: ${AUTH_PROVIDER:-local}
+      MEDIA_STORAGE_PROVIDER: ${MEDIA_STORAGE_PROVIDER:-local}
+      PAYMENT_FLOW_MODE: ${PAYMENT_FLOW_MODE:-rmq}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-mock}
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       BACKEND_BASE_URL: http://localhost:3001
       PORT: 3001
@@ -52,6 +58,14 @@ services:
       RABBITMQ_PAYMENT_DLQ: payment_queue_dlq
       STRIPE_CURRENCY: brl
       STRIPE_WEBHOOK_SECRET: ""
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL:-}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY:-}
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${FIREBASE_SERVICE_ACCOUNT_JSON:-}
+      FIREBASE_DATABASE_URL: ${FIREBASE_DATABASE_URL:-}
+      FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET:-}
+      FIREBASE_STORAGE_PUBLIC: ${FIREBASE_STORAGE_PUBLIC:-false}
+      FIREBASE_AUTH_EMULATOR_HOST: ${FIREBASE_AUTH_EMULATOR_HOST:-}
       CSRF_ENABLED: "true"
       AUTH_COOKIE_SECURE: "false"
       AUTH_COOKIE_SAMESITE: lax

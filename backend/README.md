@@ -19,6 +19,7 @@ Backend NestJS com arquitetura em camadas (DDD + SOLID + Clean Code), Prisma no 
 - Administração de créditos (CRUD de planos + configuração global de bônus/indicação).
 - Upload validado por tipo/tamanho.
 - Pagamento assíncrono com suporte `mock` e Stripe real com webhook assinado.
+- Matriz de providers por configuração (Postgres/Firestore/Realtime, Auth local/Firebase/híbrida, Storage local/Firebase, Stripe sync/RMQ).
 - Logs centralizados com `nestjs-pino` e `ApiLogger`.
 
 ### Estrutura de camadas
@@ -46,6 +47,15 @@ Backend NestJS com arquitetura em camadas (DDD + SOLID + Clean Code), Prisma no 
 - Estratégia DLQ para falhas finais (`RABBITMQ_PAYMENT_DLQ`).
 - Webhook Stripe assinado (`/payments/webhook/stripe`) para confirmação oficial.
 - Fluxo paralelo para créditos: `credit_purchase_outbox` + `CreditOutboxDispatcher` + `CreditPaymentWorker` (evento `credit.checkout.requested`).
+- Idempotência persistente de webhook Stripe com armazenamento durável de eventos processados.
+
+### Matriz de providers (sem hardcode)
+
+- Banco de dados: `DATABASE_PROVIDER=postgres|firestore|realtime`
+- Autenticação: `AUTH_MODE=local|firebase|hybrid`
+- Mídia (avatar/pôster): `MEDIA_STORAGE_PROVIDER=local|firebase`
+- Pagamento: `PAYMENT_PROVIDER=mock|stripe`
+- Transporte do checkout Stripe: `PAYMENT_FLOW_MODE=rmq|sync`
 
 ### Rodar local (sem Docker)
 
@@ -69,12 +79,33 @@ No backend em produção local:
 - Runtime: `APP_ENV`, `PORT`, `APP_LOGGER_ENABLED`.
 - CORS/CSP: `CORS_ALLOWED_ORIGINS`, `NEXT_PUBLIC_FRONTEND_URL`, `CSP_*`.
 - Upload: `UPLOADS_DIR`, `UPLOAD_MAX_FILE_SIZE_MB`, `UPLOAD_ALLOWED_MIME_TYPES`.
-- Auth: `JWT_*`, `AUTH_JWE_*`, `AUTH_COOKIE_*`, `CSRF_ENABLED`, `AUTH_PROVIDER`, `FIREBASE_*`.
+- Auth: `JWT_*`, `AUTH_JWE_*`, `AUTH_COOKIE_*`, `CSRF_ENABLED`, `AUTH_MODE`, `AUTH_PROVIDER` (compat legado), `FIREBASE_*`.
 - Mensageria: `RABBITMQ_URL`, `RABBITMQ_PAYMENT_QUEUE`, `RABBITMQ_PAYMENT_DLQ`, `RABBITMQ_PREFETCH`.
-- Pagamento: `PAYMENT_PROVIDER`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
+- Pagamento: `PAYMENT_PROVIDER`, `PAYMENT_FLOW_MODE`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
+- Banco/CDN Firebase: `DATABASE_PROVIDER`, `MEDIA_STORAGE_PROVIDER`, `FIREBASE_DATABASE_URL`, `FIREBASE_STORAGE_BUCKET`, `FIREBASE_STORAGE_PUBLIC`, `FIREBASE_AUTH_EMULATOR_HOST`.
 - Créditos: `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_*`.
 - Referência pronta para bootstrap local: `/envexample.txt`.
 - Para execução local, copie/renomeie `envexample.txt` para `.env` na raiz do projeto.
+
+### Perfis recomendados de execução
+
+- Simulado (rápido/local):
+  - `DATABASE_PROVIDER=postgres`
+  - `AUTH_MODE=local`
+  - `MEDIA_STORAGE_PROVIDER=local`
+  - `PAYMENT_PROVIDER=mock`
+  - `PAYMENT_FLOW_MODE=rmq`
+- Híbrido Firebase + Stripe:
+  - `DATABASE_PROVIDER=firestore` ou `realtime`
+  - `AUTH_MODE=hybrid`
+  - `MEDIA_STORAGE_PROVIDER=firebase`
+  - `PAYMENT_PROVIDER=stripe`
+  - `PAYMENT_FLOW_MODE=rmq` ou `sync`
+
+### Observações de bootstrap
+
+- O comando `start:prod:migrate` mantém compatibilidade Docker-first e executa pipeline Prisma antes do bootstrap do Nest.
+- Em modo Firebase (`firestore`/`realtime`), o Prisma não é usado como repositório ativo em runtime, mas o projeto continua compatível com o fluxo operacional padrão.
 
 ### Deploy Railway
 
@@ -102,6 +133,7 @@ NestJS backend with layered architecture (DDD + SOLID + Clean Code), Prisma pers
 - Admin credit management (plan CRUD + global bonus/referral config).
 - Strict upload validation (type/size).
 - Async payment with `mock` mode and real Stripe support through signed webhook.
+- Provider matrix through configuration (Postgres/Firestore/Realtime, local/Firebase/hybrid auth, local/Firebase storage, Stripe sync/RMQ).
 - Centralized logging with `nestjs-pino` and `ApiLogger`.
 
 ### Layered structure
@@ -129,6 +161,15 @@ NestJS backend with layered architecture (DDD + SOLID + Clean Code), Prisma pers
 - DLQ strategy for terminal failures (`RABBITMQ_PAYMENT_DLQ`).
 - Signed Stripe webhook endpoint (`/payments/webhook/stripe`) for official confirmation.
 - Parallel credits async path: `credit_purchase_outbox` + `CreditOutboxDispatcher` + `CreditPaymentWorker` (`credit.checkout.requested` event).
+- Durable Stripe webhook idempotency with persisted processed-event tracking.
+
+### Provider matrix (no hardcode)
+
+- Database: `DATABASE_PROVIDER=postgres|firestore|realtime`
+- Auth: `AUTH_MODE=local|firebase|hybrid`
+- Media (avatar/poster): `MEDIA_STORAGE_PROVIDER=local|firebase`
+- Payment provider: `PAYMENT_PROVIDER=mock|stripe`
+- Stripe transport mode: `PAYMENT_FLOW_MODE=rmq|sync`
 
 ### Run locally (without Docker)
 
@@ -152,12 +193,33 @@ Backend production-local bootstrap:
 - Runtime: `APP_ENV`, `PORT`, `APP_LOGGER_ENABLED`.
 - CORS/CSP: `CORS_ALLOWED_ORIGINS`, `NEXT_PUBLIC_FRONTEND_URL`, `CSP_*`.
 - Upload: `UPLOADS_DIR`, `UPLOAD_MAX_FILE_SIZE_MB`, `UPLOAD_ALLOWED_MIME_TYPES`.
-- Auth: `JWT_*`, `AUTH_JWE_*`, `AUTH_COOKIE_*`, `CSRF_ENABLED`, `AUTH_PROVIDER`, `FIREBASE_*`.
+- Auth: `JWT_*`, `AUTH_JWE_*`, `AUTH_COOKIE_*`, `CSRF_ENABLED`, `AUTH_MODE`, `AUTH_PROVIDER` (legacy alias), `FIREBASE_*`.
 - Messaging: `RABBITMQ_URL`, `RABBITMQ_PAYMENT_QUEUE`, `RABBITMQ_PAYMENT_DLQ`, `RABBITMQ_PREFETCH`.
-- Payment: `PAYMENT_PROVIDER`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
+- Payment: `PAYMENT_PROVIDER`, `PAYMENT_FLOW_MODE`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
+- Firebase DB/CDN: `DATABASE_PROVIDER`, `MEDIA_STORAGE_PROVIDER`, `FIREBASE_DATABASE_URL`, `FIREBASE_STORAGE_BUCKET`, `FIREBASE_STORAGE_PUBLIC`, `FIREBASE_AUTH_EMULATOR_HOST`.
 - Credits: `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_*`.
 - Ready-to-copy bootstrap reference: `/envexample.txt`.
 - For local execution, copy/rename `envexample.txt` to `.env` at project root.
+
+### Recommended run profiles
+
+- Simulated (fast/local):
+  - `DATABASE_PROVIDER=postgres`
+  - `AUTH_MODE=local`
+  - `MEDIA_STORAGE_PROVIDER=local`
+  - `PAYMENT_PROVIDER=mock`
+  - `PAYMENT_FLOW_MODE=rmq`
+- Hybrid Firebase + Stripe:
+  - `DATABASE_PROVIDER=firestore` or `realtime`
+  - `AUTH_MODE=hybrid`
+  - `MEDIA_STORAGE_PROVIDER=firebase`
+  - `PAYMENT_PROVIDER=stripe`
+  - `PAYMENT_FLOW_MODE=rmq` or `sync`
+
+### Bootstrap notes
+
+- `start:prod:migrate` preserves Docker-first compatibility and runs Prisma pipeline before Nest startup.
+- In Firebase database mode (`firestore`/`realtime`), Prisma is not the active runtime repository, while operational bootstrap remains consistent.
 
 ### Railway deployment
 

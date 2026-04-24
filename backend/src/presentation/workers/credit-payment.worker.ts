@@ -83,6 +83,7 @@ export class CreditPaymentWorker {
           'STRIPE_CURRENCY',
           DEFAULT_CURRENCY,
         ),
+        purchaseKind: 'credit',
       });
 
       if (result.approved) {

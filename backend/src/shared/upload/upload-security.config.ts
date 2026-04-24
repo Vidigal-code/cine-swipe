@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
-import { diskStorage } from 'multer';
+import { diskStorage, memoryStorage } from 'multer';
 import { extname, isAbsolute, resolve } from 'path';
 
 const DEFAULT_UPLOADS_DIR = './uploads';
@@ -17,16 +17,7 @@ export function buildAvatarUploadOptions() {
 
 function buildImageUploadOptions(filePrefix: string) {
   return {
-    storage: diskStorage({
-      destination: resolveUploadsDirectory(),
-      filename: (_req, file, cb) => {
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(
-          null,
-          `${filePrefix}-${uniqueSuffix}${extname(file.originalname).toLowerCase()}`,
-        );
-      },
-    }),
+    storage: resolveStorage(filePrefix),
     limits: {
       fileSize: resolveMaxFileSizeBytes(),
     },
@@ -35,14 +26,9 @@ function buildImageUploadOptions(filePrefix: string) {
       file: Express.Multer.File,
       cb: FileFilterCb,
     ) => {
-      const isAllowed = resolveAllowedMimeTypes().includes(file.mimetype);
-      if (!isAllowed) {
-        cb(
-          new BadRequestException(
-            `Invalid file type. Allowed: ${resolveAllowedMimeTypes().join(', ')}`,
-          ),
-          false,
-        );
+      const validationError = validateFile(file);
+      if (validationError) {
+        cb(new BadRequestException(validationError), false);
         return;
       }
       cb(null, true);
@@ -51,6 +37,25 @@ function buildImageUploadOptions(filePrefix: string) {
 }
 
 type FileFilterCb = (error: Error | null, acceptFile: boolean) => void;
+
+function resolveStorage(filePrefix: string) {
+  const provider = (process.env.MEDIA_STORAGE_PROVIDER || 'local')
+    .trim()
+    .toLowerCase();
+  if (provider === 'firebase') {
+    return memoryStorage();
+  }
+  return diskStorage({
+    destination: resolveUploadsDirectory(),
+    filename: (_req, file, cb) => {
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      cb(
+        null,
+        `${filePrefix}-${uniqueSuffix}${extname(file.originalname).toLowerCase()}`,
+      );
+    },
+  });
+}
 
 function resolveUploadsDirectory(): string {
   const configuredDir = process.env.UPLOADS_DIR || DEFAULT_UPLOADS_DIR;
@@ -86,4 +91,32 @@ function resolveAllowedMimeTypes(): string[] {
     .filter((value) => value.length > 0);
 
   return parsed.length > 0 ? parsed : DEFAULT_ALLOWED_MIME_TYPES;
+}
+
+function validateFile(file: Express.Multer.File): string | null {
+  const allowedMimeTypes = resolveAllowedMimeTypes();
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    return `Invalid file type. Allowed: ${allowedMimeTypes.join(', ')}`;
+  }
+  const extension = extname(file.originalname).toLowerCase();
+  if (!isExtensionAllowedForMime(file.mimetype, extension)) {
+    return 'File extension does not match the provided mime type.';
+  }
+  return null;
+}
+
+function isExtensionAllowedForMime(
+  mimeType: string,
+  extension: string,
+): boolean {
+  const mapping: Record<string, string[]> = {
+    'image/jpeg': ['.jpg', '.jpeg'],
+    'image/png': ['.png'],
+    'image/webp': ['.webp'],
+  };
+  const allowedExtensions = mapping[mimeType];
+  if (!allowedExtensions) {
+    return false;
+  }
+  return allowedExtensions.includes(extension);
 }

@@ -39,8 +39,11 @@ export default function MovieDetailsPage({ params }: { params: { id: string } })
 
     const checkoutMutation = useMutation({
         mutationFn: paymentApi.checkout,
-        onSuccess: () => {
-            // Directs user to 'minha lista' after fake intent creation
+        onSuccess: (checkoutResult) => {
+            if (checkoutResult.status === 'FAILED') {
+                alert(MOVIE_DETAILS_TEXTS.paymentError);
+                return;
+            }
             router.push('/my-movies?success=true');
         },
         onError: () => {

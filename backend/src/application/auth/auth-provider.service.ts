@@ -5,6 +5,7 @@ import type { IUserRepository } from '../../domain/user/interfaces/user.reposito
 import { User, UserRole } from '../../domain/user/entities/user.entity';
 import { FirebaseAuthService } from '../../infrastructure/auth/firebase-auth.service';
 import { generateReferralCode } from '../../shared/auth/referral-code.util';
+import { resolveAuthMode } from '../../shared/config/platform.config';
 
 interface ResolveFirebaseUserOptions {
   requestedRole?: UserRole;
@@ -21,9 +22,27 @@ export class AuthProviderService {
     private readonly firebaseAuthService: FirebaseAuthService,
   ) {}
 
-  getAuthProvider(): 'local' | 'firebase' {
-    const provider = this.configService.get<string>('AUTH_PROVIDER', 'local');
-    return provider === 'firebase' ? 'firebase' : 'local';
+  getAuthMode(): 'local' | 'firebase' | 'hybrid' {
+    return resolveAuthMode(this.configService);
+  }
+
+  resolveAuthProviderForPayload(
+    hasFirebaseToken: boolean,
+  ): 'local' | 'firebase' {
+    const mode = this.getAuthMode();
+    if (mode === 'local') {
+      return 'local';
+    }
+    if (mode === 'firebase') {
+      return 'firebase';
+    }
+    return hasFirebaseToken ? 'firebase' : 'local';
+  }
+
+  assertFirebaseProviderAvailable(): void {
+    if (!this.firebaseAuthService.isEnabled()) {
+      throw new BadRequestException('Firebase auth provider is not configured');
+    }
   }
 
   async resolveOrCreateFirebaseUser(
@@ -31,6 +50,7 @@ export class AuthProviderService {
     options?: ResolveFirebaseUserOptions,
   ): Promise<{ user: User; isNewlyCreated: boolean }> {
     const requestedRole = options?.requestedRole ?? UserRole.USER;
+    this.assertFirebaseProviderAvailable();
     const decodedToken =
       await this.firebaseAuthService.verifyIdToken(firebaseIdToken);
     const email = decodedToken.email;

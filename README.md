@@ -53,14 +53,24 @@ Se ocorrer erro intermitente de pull no Docker Hub (por exemplo `TLS handshake t
 ### Integrações simuladas e reais
 
 - Padrão local/simulado:
-  - `AUTH_PROVIDER=local`
+  - `DATABASE_PROVIDER=postgres`
+  - `AUTH_MODE=local`
+  - `MEDIA_STORAGE_PROVIDER=local`
+  - `PAYMENT_FLOW_MODE=rmq`
   - `PAYMENT_PROVIDER=mock`
   - créditos e indicação habilitados via config global seed (`credit_system_config`, id=1)
+- Modo híbrido (recomendado para desenvolvimento avançado):
+  - `DATABASE_PROVIDER=firestore` ou `DATABASE_PROVIDER=realtime`
+  - `AUTH_MODE=hybrid` (aceita login local e Firebase no mesmo backend)
+  - `MEDIA_STORAGE_PROVIDER=firebase`
+  - `PAYMENT_FLOW_MODE=rmq` ou `PAYMENT_FLOW_MODE=sync`
+  - `PAYMENT_PROVIDER=stripe`
 - Variáveis novas de créditos/outbox:
   - `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_BATCH_SIZE`, `CREDIT_OUTBOX_MAX_ATTEMPTS`, `CREDIT_OUTBOX_DISPATCH_INTERVAL_MS`, `CREDIT_OUTBOX_RETRY_DELAY_MS`
 - Suporte real:
-  - Firebase: `AUTH_PROVIDER=firebase` + variáveis `FIREBASE_*`.
+  - Firebase Auth/Database/CDN: configure `FIREBASE_*` (`FIREBASE_DATABASE_URL`, `FIREBASE_STORAGE_BUCKET`, etc.).
   - Stripe: `PAYMENT_PROVIDER=stripe` + `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`.
+  - Emulador Firebase Auth opcional em local: `FIREBASE_AUTH_EMULATOR_HOST=host.docker.internal:9099`.
 
 ### Deploy (Railway)
 
@@ -133,14 +143,24 @@ If you hit intermittent Docker Hub pull errors (for example `TLS handshake timeo
 ### Simulated and real integrations
 
 - Local simulated default:
-  - `AUTH_PROVIDER=local`
+  - `DATABASE_PROVIDER=postgres`
+  - `AUTH_MODE=local`
+  - `MEDIA_STORAGE_PROVIDER=local`
+  - `PAYMENT_FLOW_MODE=rmq`
   - `PAYMENT_PROVIDER=mock`
   - credit/referral engine bootstrapped by global seeded config (`credit_system_config`, id=1)
+- Hybrid mode (recommended for advanced development):
+  - `DATABASE_PROVIDER=firestore` or `DATABASE_PROVIDER=realtime`
+  - `AUTH_MODE=hybrid` (same backend accepts local and Firebase login)
+  - `MEDIA_STORAGE_PROVIDER=firebase`
+  - `PAYMENT_FLOW_MODE=rmq` or `PAYMENT_FLOW_MODE=sync`
+  - `PAYMENT_PROVIDER=stripe`
 - New credit/outbox variables:
   - `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_BATCH_SIZE`, `CREDIT_OUTBOX_MAX_ATTEMPTS`, `CREDIT_OUTBOX_DISPATCH_INTERVAL_MS`, `CREDIT_OUTBOX_RETRY_DELAY_MS`
 - Real integration support:
-  - Firebase: `AUTH_PROVIDER=firebase` + `FIREBASE_*` variables.
+  - Firebase Auth/Database/CDN: configure `FIREBASE_*` (`FIREBASE_DATABASE_URL`, `FIREBASE_STORAGE_BUCKET`, etc.).
   - Stripe: `PAYMENT_PROVIDER=stripe` + `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`.
+  - Optional local Firebase Auth emulator: `FIREBASE_AUTH_EMULATOR_HOST=host.docker.internal:9099`.
 
 ### Deploy (Railway)
 

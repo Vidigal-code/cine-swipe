@@ -15,7 +15,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
 
 import { MovieService } from '../../application/movie/movie.service';
@@ -28,7 +27,7 @@ import { buildMovieUploadOptions } from '../../shared/upload/upload-security.con
 import { CreateMovieDto } from './dto/movie/create-movie.dto';
 import { UpdateMovieDto } from './dto/movie/update-movie.dto';
 import { ResponseFactory } from '../../shared/http-response/response.factory';
-import { buildPublicBackendUrl } from '../../shared/config/public-backend-url.util';
+import { MediaStorageService } from '../../application/media/media-storage.service';
 import type {
   PaginatedResponse,
   UploadResponse,
@@ -38,8 +37,8 @@ import type {
 export class MovieController {
   constructor(
     private readonly movieService: MovieService,
-    private readonly configService: ConfigService,
     private readonly responseFactory: ResponseFactory,
+    private readonly mediaStorageService: MediaStorageService,
   ) {}
 
   @Post()
@@ -54,15 +53,18 @@ export class MovieController {
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('file', buildMovieUploadOptions()))
-  uploadFile(
+  async uploadFile(
     @Req() request: Request,
     @UploadedFile() file: Express.Multer.File,
-  ): UploadResponse {
+  ): Promise<UploadResponse> {
     if (!file) {
       throw new BadRequestException('Arquivo de poster obrigatorio.');
     }
-    const backendBaseUrl = buildPublicBackendUrl(this.configService, request);
-    const url = `${backendBaseUrl}/uploads/${encodeURIComponent(file.filename)}`;
+    const url = await this.mediaStorageService.saveUploadedImage(
+      request,
+      file,
+      'posters',
+    );
     return this.responseFactory.upload(url);
   }
 
@@ -98,5 +100,4 @@ export class MovieController {
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.movieService.deleteMovie(id);
   }
-
 }

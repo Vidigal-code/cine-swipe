@@ -80,12 +80,15 @@ export class PaymentWorker {
           'STRIPE_CURRENCY',
           DEFAULT_CURRENCY,
         ),
+        purchaseKind: 'movie',
       });
 
       if (result.approved) {
-        await this.paymentService.updatePurchaseStatusWithAudit(
+        await this.paymentService.updatePurchasePaymentResultWithAudit(
           event.purchaseId,
           PurchaseStatus.COMPLETED,
+          null,
+          result.externalReference ?? null,
           PaymentAuditSource.WORKER,
           'Pagamento aprovado no worker assíncrono',
         );
@@ -105,9 +108,11 @@ export class PaymentWorker {
         return;
       }
 
-      await this.paymentService.updatePurchaseStatusWithAudit(
+      await this.paymentService.updatePurchasePaymentResultWithAudit(
         event.purchaseId,
         PurchaseStatus.FAILED,
+        result.failureReason ?? 'gateway_declined_after_max_retries',
+        result.externalReference ?? null,
         PaymentAuditSource.WORKER,
         'Pagamento recusado após tentativas máximas',
       );
@@ -123,9 +128,13 @@ export class PaymentWorker {
       if (this.shouldRetry(event.retryCount, maxRetries)) {
         await this.requeueWithNextRetry(event);
       } else {
-        await this.paymentService.updatePurchaseStatusWithAudit(
+        await this.paymentService.updatePurchasePaymentResultWithAudit(
           event.purchaseId,
           PurchaseStatus.FAILED,
+          error instanceof Error
+            ? error.message
+            : 'gateway_exception_after_max_retries',
+          null,
           PaymentAuditSource.WORKER,
           'Pagamento falhou por exceção após tentativas máximas',
         );

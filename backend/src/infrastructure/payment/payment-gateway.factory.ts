@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { IPaymentGateway } from '../../application/payment/interfaces/payment-gateway.interface';
 import { MockPaymentGateway } from './mock-payment.gateway';
 import { StripeGateway } from './stripe.gateway';
+import { resolvePaymentProvider } from '../../shared/config/platform.config';
 
 @Injectable()
 export class PaymentGatewayFactory {
@@ -21,6 +22,6 @@ export class PaymentGatewayFactory {
   }
 
   resolveDefaultProvider(): string {
-    return this.configService.get<string>('PAYMENT_PROVIDER', 'mock');
+    return resolvePaymentProvider(this.configService);
   }
 }

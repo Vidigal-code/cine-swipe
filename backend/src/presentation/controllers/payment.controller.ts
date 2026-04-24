@@ -50,7 +50,10 @@ export class PaymentController {
     @Query() query: PaginationQueryDto,
   ): Promise<PaginatedResponse<Movie>> {
     const userId = req.user.sub;
-    const paginatedMovies = await this.paymentService.getUserMoviesPage(userId, query);
+    const paginatedMovies = await this.paymentService.getUserMoviesPage(
+      userId,
+      query,
+    );
     return this.responseFactory.paginated(paginatedMovies);
   }
 }

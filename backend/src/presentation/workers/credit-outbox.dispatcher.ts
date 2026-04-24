@@ -20,6 +20,7 @@ import {
 import { readPositiveIntConfig } from '../../shared/config/env-number.util';
 import { ApiLogger } from '../../shared/logger/api-logger';
 import { CREDIT_CHECKOUT_FAILED_EVENT } from '../../application/credit/credit.service';
+import { isRmqPaymentFlow } from '../../shared/config/platform.config';
 
 const DEFAULT_DISPATCH_BATCH_SIZE = 25;
 const DEFAULT_OUTBOX_MAX_ATTEMPTS = 5;
@@ -43,6 +44,9 @@ export class CreditOutboxDispatcher implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit(): void {
+    if (!isRmqPaymentFlow(this.configService)) {
+      return;
+    }
     const intervalMs = readPositiveIntConfig(
       this.configService,
       'CREDIT_OUTBOX_DISPATCH_INTERVAL_MS',

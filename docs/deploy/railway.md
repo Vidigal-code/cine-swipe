@@ -38,7 +38,10 @@ Este guia adiciona suporte de deploy no Railway sem perder o modo principal do p
 - `CORS_ALLOWED_ORIGINS`
 - `NEXT_PUBLIC_FRONTEND_URL`
 - `PAYMENT_PROVIDER` (`mock` ou `stripe`)
-- `AUTH_PROVIDER` (`local` ou `firebase`)
+- `PAYMENT_FLOW_MODE` (`rmq` ou `sync`)
+- `AUTH_MODE` (`local`, `firebase` ou `hybrid`)
+- `DATABASE_PROVIDER` (`postgres`, `firestore` ou `realtime`)
+- `MEDIA_STORAGE_PROVIDER` (`local` ou `firebase`)
 
 #### Variáveis para Stripe real
 
@@ -52,6 +55,15 @@ Este guia adiciona suporte de deploy no Railway sem perder o modo principal do p
 - `FIREBASE_CLIENT_EMAIL`
 - `FIREBASE_PRIVATE_KEY`
 - `FIREBASE_SERVICE_ACCOUNT_JSON` (opcional, alternativa ao trio acima)
+- `FIREBASE_DATABASE_URL` (obrigatória ao usar `DATABASE_PROVIDER=realtime`)
+- `FIREBASE_STORAGE_BUCKET` (obrigatória ao usar `MEDIA_STORAGE_PROVIDER=firebase`)
+- `FIREBASE_STORAGE_PUBLIC` (`true`/`false`)
+
+#### Observações importantes de ambiente
+
+- `FIREBASE_AUTH_EMULATOR_HOST` deve ser usado apenas em desenvolvimento local.
+- Em produção Railway, mantenha `FIREBASE_AUTH_EMULATOR_HOST` vazio.
+- Se `MEDIA_STORAGE_PROVIDER=firebase`, configure bucket e permissões do Storage antes do go-live.
 
 #### Comando de start
 
@@ -84,9 +96,11 @@ Esse comando garante `prisma generate` + `prisma migrate deploy` antes do bootst
 - [ ] Frontend consome API pública correta (`NEXT_PUBLIC_API_URL`).
 - [ ] Login/cadastro funcionam via cookie HttpOnly + CSRF.
 - [ ] Checkout `mock` funciona com fila assíncrona.
-- [ ] Checkout Stripe real confirma status via webhook.
+- [ ] Checkout Stripe real funciona em `rmq` e/ou `sync` conforme `PAYMENT_FLOW_MODE`.
+- [ ] Webhook Stripe confirma status com idempotência persistida.
 - [ ] Logs exibem `correlationId` para rastreabilidade.
 - [ ] Falhas finais de fila aparecem na DLQ.
+- [ ] `FIREBASE_AUTH_EMULATOR_HOST` não está configurado em produção.
 
 </details>
 
@@ -128,7 +142,10 @@ This runbook adds Railway deployment support while preserving the default projec
 - `CORS_ALLOWED_ORIGINS`
 - `NEXT_PUBLIC_FRONTEND_URL`
 - `PAYMENT_PROVIDER` (`mock` or `stripe`)
-- `AUTH_PROVIDER` (`local` or `firebase`)
+- `PAYMENT_FLOW_MODE` (`rmq` or `sync`)
+- `AUTH_MODE` (`local`, `firebase`, or `hybrid`)
+- `DATABASE_PROVIDER` (`postgres`, `firestore`, or `realtime`)
+- `MEDIA_STORAGE_PROVIDER` (`local` or `firebase`)
 
 #### Variables for real Stripe
 
@@ -142,6 +159,15 @@ This runbook adds Railway deployment support while preserving the default projec
 - `FIREBASE_CLIENT_EMAIL`
 - `FIREBASE_PRIVATE_KEY`
 - `FIREBASE_SERVICE_ACCOUNT_JSON` (optional, alternative to the trio above)
+- `FIREBASE_DATABASE_URL` (required when `DATABASE_PROVIDER=realtime`)
+- `FIREBASE_STORAGE_BUCKET` (required when `MEDIA_STORAGE_PROVIDER=firebase`)
+- `FIREBASE_STORAGE_PUBLIC` (`true`/`false`)
+
+#### Important environment notes
+
+- `FIREBASE_AUTH_EMULATOR_HOST` is for local development only.
+- On Railway production, keep `FIREBASE_AUTH_EMULATOR_HOST` empty.
+- If `MEDIA_STORAGE_PROVIDER=firebase`, provision bucket and Storage permissions before go-live.
 
 #### Start command
 
@@ -174,8 +200,10 @@ This ensures `prisma generate` + `prisma migrate deploy` before Nest bootstrap.
 - [ ] Frontend points to correct API (`NEXT_PUBLIC_API_URL`).
 - [ ] Login/register works with HttpOnly cookie + CSRF.
 - [ ] `mock` checkout works through async queue.
-- [ ] Real Stripe checkout syncs status through webhook.
+- [ ] Real Stripe checkout works in `rmq` and/or `sync` based on `PAYMENT_FLOW_MODE`.
+- [ ] Stripe webhook syncs status with persisted idempotency.
 - [ ] Logs include `correlationId` for traceability.
 - [ ] Terminal queue failures are routed to DLQ.
+- [ ] `FIREBASE_AUTH_EMULATOR_HOST` is not configured in production.
 
 </details>

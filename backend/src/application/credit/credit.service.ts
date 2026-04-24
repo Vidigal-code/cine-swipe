@@ -31,6 +31,8 @@ import { CREDIT_MESSAGES_PT_BR } from '../../shared/credit/credit-messages.pt-br
 import { PaymentGatewayFactory } from '../../infrastructure/payment/payment-gateway.factory';
 import { ApiLogger } from '../../shared/logger/api-logger';
 import { ReferralRewardType } from '../../domain/credit/entities/referral-reward-log.entity';
+import { ConfigService } from '@nestjs/config';
+import { isRmqPaymentFlow } from '../../shared/config/platform.config';
 
 export const CREDIT_CHECKOUT_REQUESTED_EVENT = 'credit.checkout.requested';
 export const CREDIT_CHECKOUT_FAILED_EVENT = 'credit.checkout.failed';
@@ -45,6 +47,7 @@ export class CreditService {
     private readonly userRepository: IUserRepository,
     private readonly paymentGatewayFactory: PaymentGatewayFactory,
     private readonly paginationService: PaginationService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getUserBalance(userId: string): Promise<number> {
@@ -93,27 +96,36 @@ export class CreditService {
 
     const provider = this.paymentGatewayFactory.resolveDefaultProvider();
     const correlationId = randomUUID();
+    const useRmqFlow = isRmqPaymentFlow(this.configService);
 
-    const purchase = await this.creditRepository.createCreditPurchaseWithOutbox(
-      {
-        userId,
-        creditPlanId: plan.id,
-        creditsAmount: plan.creditsAmount,
-        amountBrl: plan.priceBrl,
-        provider,
-        correlationId,
-      },
-      {
-        eventType: CREDIT_CHECKOUT_REQUESTED_EVENT,
-        payload: {
-          creditsAmount: plan.creditsAmount,
-          amountBrl: plan.priceBrl,
-          provider,
-          correlationId,
-          retryCount: 0,
-        },
-      },
-    );
+    const purchaseInput = {
+      userId,
+      creditPlanId: plan.id,
+      creditsAmount: plan.creditsAmount,
+      amountBrl: plan.priceBrl,
+      provider,
+      correlationId,
+    };
+    const purchase = useRmqFlow
+      ? await this.creditRepository.createCreditPurchaseWithOutbox(
+          purchaseInput,
+          {
+            eventType: CREDIT_CHECKOUT_REQUESTED_EVENT,
+            payload: {
+              creditsAmount: plan.creditsAmount,
+              amountBrl: plan.priceBrl,
+              provider,
+              correlationId,
+              retryCount: 0,
+            },
+          },
+        )
+      : await this.creditRepository.createCreditPurchase(purchaseInput);
+
+    if (!useRmqFlow) {
+      await this.processCheckoutSynchronously(purchase);
+      return (await this.markCheckoutLookup(purchase.id)) ?? purchase;
+    }
 
     return purchase;
   }
@@ -409,6 +421,38 @@ export class CreditService {
   private validatePriceBrl(value: number): void {
     if (!Number.isFinite(value) || value <= 0) {
       throw new BadRequestException(CREDIT_MESSAGES_PT_BR.invalidPriceBrl);
+    }
+  }
+
+  private async processCheckoutSynchronously(
+    purchase: CreditPurchase,
+  ): Promise<void> {
+    try {
+      const gateway = this.paymentGatewayFactory.resolveGateway(
+        purchase.provider,
+      );
+      const result = await gateway.processPayment({
+        purchaseId: purchase.id,
+        amount: purchase.amountBrl,
+        correlationId: purchase.correlationId,
+        currency: this.configService.get<string>('STRIPE_CURRENCY', 'brl'),
+        purchaseKind: 'credit',
+      });
+      if (result.approved) {
+        await this.markCheckoutCompleted(purchase.id, result.externalReference);
+        return;
+      }
+      await this.markCheckoutFailed(
+        purchase.id,
+        result.failureReason ?? 'sync_credit_payment_declined',
+        result.externalReference,
+      );
+    } catch (error) {
+      await this.markCheckoutFailed(
+        purchase.id,
+        error instanceof Error ? error.message : 'sync_credit_payment_failed',
+      );
+      throw error;
     }
   }
 }

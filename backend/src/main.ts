@@ -12,6 +12,10 @@ import { buildCorsOptions } from 'src/shared/cors.config';
 import { ApiLogger } from 'src/shared/logger/api-logger';
 import { readPositiveIntConfig } from 'src/shared/config/env-number.util';
 import { buildHelmetOptions } from 'src/shared/security-headers.config';
+import {
+  isRmqPaymentFlow,
+  validatePlatformConfig,
+} from 'src/shared/config/platform.config';
 
 const DEFAULT_RABBITMQ_PREFETCH = 25;
 
@@ -21,6 +25,7 @@ async function bootstrap() {
   });
   app.useLogger(app.get(PinoLogger));
   const configService = app.get(ConfigService);
+  validatePlatformConfig(configService);
 
   app.use(cookieParser());
   app.use(helmet(buildHelmetOptions(configService)));
@@ -41,42 +46,45 @@ async function bootstrap() {
   });
 
   const port = configService.get<number>('PORT', 3001);
-  const rmqUrl = configService.get<string>(
-    'RABBITMQ_URL',
-    'amqp://guest:guest@localhost:5672',
-  );
-  const paymentQueue = configService.get<string>(
-    'RABBITMQ_PAYMENT_QUEUE',
-    'payment_queue',
-  );
-  const paymentDlq = configService.get<string>(
-    'RABBITMQ_PAYMENT_DLQ',
-    'payment_queue_dlq',
-  );
-  const prefetchCount = readPositiveIntConfig(
-    configService,
-    'RABBITMQ_PREFETCH',
-    DEFAULT_RABBITMQ_PREFETCH,
-  );
+  if (isRmqPaymentFlow(configService)) {
+    const rmqUrl = configService.get<string>(
+      'RABBITMQ_URL',
+      'amqp://guest:guest@localhost:5672',
+    );
+    const paymentQueue = configService.get<string>(
+      'RABBITMQ_PAYMENT_QUEUE',
+      'payment_queue',
+    );
+    const paymentDlq = configService.get<string>(
+      'RABBITMQ_PAYMENT_DLQ',
+      'payment_queue_dlq',
+    );
+    const prefetchCount = readPositiveIntConfig(
+      configService,
+      'RABBITMQ_PREFETCH',
+      DEFAULT_RABBITMQ_PREFETCH,
+    );
 
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [rmqUrl],
-      queue: paymentQueue,
-      queueOptions: {
-        durable: true,
-        arguments: {
-          'x-dead-letter-exchange': '',
-          'x-dead-letter-routing-key': paymentDlq,
+    app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.RMQ,
+      options: {
+        urls: [rmqUrl],
+        queue: paymentQueue,
+        queueOptions: {
+          durable: true,
+          arguments: {
+            'x-dead-letter-exchange': '',
+            'x-dead-letter-routing-key': paymentDlq,
+          },
         },
+        noAck: false,
+        prefetchCount,
       },
-      noAck: false,
-      prefetchCount,
-    },
-  });
+    });
 
-  await app.startAllMicroservices();
+    await app.startAllMicroservices();
+  }
+
   await app.listen(port);
   ApiLogger.log(`Backend is running on: http://localhost:${port}`, 'Bootstrap');
 }
@@ -87,4 +95,4 @@ function resolveUploadsAbsolutePath(uploadsDir: string): string {
   }
   return resolve(process.cwd(), uploadsDir);
 }
-bootstrap();
+void bootstrap();

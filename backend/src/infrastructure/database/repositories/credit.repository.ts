@@ -232,6 +232,23 @@ export class PrismaCreditRepository implements ICreditRepository {
     return this.toCreditPurchase(purchase);
   }
 
+  async createCreditPurchase(
+    input: CreateCreditPurchaseInput,
+  ): Promise<CreditPurchase> {
+    const purchase = await this.prisma.creditPurchase.create({
+      data: {
+        userId: input.userId,
+        creditPlanId: input.creditPlanId,
+        creditsAmount: input.creditsAmount,
+        amountBrl: input.amountBrl,
+        status: CreditPurchaseStatus.PENDING,
+        provider: input.provider,
+        correlationId: input.correlationId,
+      },
+    });
+    return this.toCreditPurchase(purchase);
+  }
+
   async findCreditPurchaseById(id: string): Promise<CreditPurchase | null> {
     const purchase = await this.findUniqueCreditPurchase({ id });
     return purchase ? this.toCreditPurchase(purchase) : null;

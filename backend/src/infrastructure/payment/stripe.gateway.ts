@@ -32,6 +32,7 @@ export class StripeGateway implements IPaymentGateway {
         metadata: {
           purchaseId: input.purchaseId,
           correlationId: input.correlationId,
+          purchaseKind: input.purchaseKind ?? 'movie',
         },
       },
       {

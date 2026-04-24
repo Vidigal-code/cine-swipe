@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '../../domain/user/entities/user.entity';
 import { PrismaService } from './prisma.service';
+import { resolveDatabaseProvider } from '../../shared/config/platform.config';
 
 @Injectable()
 export class AdminSeedService implements OnModuleInit {
@@ -12,6 +13,10 @@ export class AdminSeedService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
+    if (resolveDatabaseProvider(this.configService) !== 'postgres') {
+      return;
+    }
+
     const username = this.configService.get<string>('ADMIN_USERNAME');
     const email = this.configService.get<string>('ADMIN_EMAIL');
     const password = this.configService.get<string>('ADMIN_PASSWORD');

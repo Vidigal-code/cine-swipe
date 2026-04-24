@@ -264,3 +264,12 @@ model ReferralRewardLog {
   @@unique([referrerUserId, refereeUserId, rewardType])
   @@map("referral_reward_logs")
 }
+
+model ProcessedWebhookEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+  @@map("processed_webhook_events")
+}

@@ -37,7 +37,7 @@ import type {
 } from '../../shared/http-response/response.types';
 import { AUTH_MESSAGES_PT_BR } from '../../shared/auth/auth-messages.pt-br';
 import { buildAvatarUploadOptions } from '../../shared/upload/upload-security.config';
-import { buildPublicBackendUrl } from '../../shared/config/public-backend-url.util';
+import { MediaStorageService } from '../../application/media/media-storage.service';
 
 type ProfilePayload = Awaited<ReturnType<AuthService['getProfile']>>;
 
@@ -47,6 +47,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly responseFactory: ResponseFactory,
+    private readonly mediaStorageService: MediaStorageService,
   ) {}
 
   @Post('register')
@@ -164,8 +165,11 @@ export class AuthController {
     if (!file) {
       throw new BadRequestException('Arquivo de avatar obrigatorio.');
     }
-    const backendBaseUrl = buildPublicBackendUrl(this.configService, request);
-    const avatarUrl = `${backendBaseUrl}/uploads/${encodeURIComponent(file.filename)}`;
+    const avatarUrl = await this.mediaStorageService.saveUploadedImage(
+      request,
+      file,
+      'avatars',
+    );
     const updated = await this.authService.updateAvatar(userId, avatarUrl);
     return this.responseFactory.user(updated);
   }
@@ -232,5 +236,4 @@ export class AuthController {
       buildCookieOptions(this.configService, 'csrf'),
     );
   }
-
 }

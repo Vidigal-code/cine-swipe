@@ -82,6 +82,9 @@ export interface ICreditRepository {
     input: CreateCreditPurchaseInput,
     outbox: CreateCreditOutboxEventInput,
   ): Promise<CreditPurchase>;
+  createCreditPurchase(
+    input: CreateCreditPurchaseInput,
+  ): Promise<CreditPurchase>;
   findCreditPurchaseById(id: string): Promise<CreditPurchase | null>;
   findCreditPurchaseByCorrelationId(
     correlationId: string,

@@ -1,4 +1,4 @@
-const AUTH_PROVIDER_FIREBASE = 'AUTH_PROVIDER=firebase';
+const AUTH_PROVIDER_FIREBASE = 'AUTH_MODE=firebase (ou AUTH_MODE=hybrid)';
 
 export const AUTH_MESSAGES_PT_BR = {
   sessionTokenRequired: 'Token de sessao obrigatorio.',

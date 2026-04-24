@@ -17,6 +17,12 @@ export interface IPurchaseRepository {
   ): Promise<Purchase>;
   findById(id: string): Promise<Purchase | null>;
   updateStatus(id: string, status: PurchaseStatus): Promise<Purchase>;
+  updatePaymentResult(
+    id: string,
+    status: PurchaseStatus,
+    failureReason?: string | null,
+    stripePaymentIntentId?: string | null,
+  ): Promise<Purchase>;
   findByUser(userId: string): Promise<Purchase[]>;
   findByUserPage(
     userId: string,
