@@ -1,98 +1,165 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Backend - Cine-Swipe
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 🇧🇷 Descrição em Português
+<details>
+<summary><strong>Ver Detalhes</strong></summary>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Visão geral
 
-## Description
+Backend NestJS com arquitetura em camadas (DDD + SOLID + Clean Code), Prisma no acesso a dados e fluxo de pagamento assíncrono com outbox + RabbitMQ + worker.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Principais responsabilidades
 
-## Project setup
+- Autenticação e autorização com JWT/JWE.
+- Sessão segura por cookies HttpOnly (access/refresh) + proteção CSRF.
+- RBAC para perfis `ADMIN` e `USER`.
+- CRUD de filmes (admin) e biblioteca de filmes comprados.
+- Sistema completo de créditos (saldo, ledger, compra por plano e indicação mista).
+- Perfil do usuário (atualização de dados, troca de senha forte e upload de avatar).
+- Administração de créditos (CRUD de planos + configuração global de bônus/indicação).
+- Upload validado por tipo/tamanho.
+- Pagamento assíncrono com suporte `mock` e Stripe real com webhook assinado.
+- Logs centralizados com `nestjs-pino` e `ApiLogger`.
 
-```bash
-$ npm install
-```
+### Estrutura de camadas
 
-## Compile and run the project
+- `src/domain`: entidades e contratos de repositório.
+- `src/application`: regras de negócio e casos de uso.
+- `src/infrastructure`: Prisma, gateways, mensageria e auth providers.
+- `src/presentation`: controllers HTTP e workers RMQ.
+- `src/shared`: componentes transversais reutilizáveis.
 
-```bash
-# development
-$ npm run start
+### Segurança enterprise implementada
 
-# watch mode
-$ npm run start:dev
+- Helmet com CSP por ambiente (`CSP_ENABLED`, `CSP_REPORT_ONLY`, `CSP_CONNECT_SRC`).
+- CORS com credenciais para fluxo baseado em cookie.
+- DTOs com `class-validator`/`class-transformer`.
+- Guard JWT com leitura de cookie e fallback em header.
+- CSRF por double-submit token (`cine_csrf_token` + header `x-csrf-token`).
+- Rate limiting global.
 
-# production mode
-$ npm run start:prod
-```
+### Pagamento profissional implementado
 
-## Run tests
+- Checkout salva compra + evento em outbox na mesma transação.
+- Dispatcher publica eventos pendentes com timeout e retries.
+- Worker processa em fila assíncrona com retry progressivo.
+- Estratégia DLQ para falhas finais (`RABBITMQ_PAYMENT_DLQ`).
+- Webhook Stripe assinado (`/payments/webhook/stripe`) para confirmação oficial.
+- Fluxo paralelo para créditos: `credit_purchase_outbox` + `CreditOutboxDispatcher` + `CreditPaymentWorker` (evento `credit.checkout.requested`).
 
-```bash
-# unit tests
-$ npm run test
+### Rodar local (sem Docker)
 
-# e2e tests
-$ npm run test:e2e
+1. `npm install`
+2. `npm run prisma:generate`
+3. `npm run prisma:migrate:deploy`
+4. `npm run start:dev`
 
-# test coverage
-$ npm run test:cov
-```
+### Rodar com Docker (recomendado)
 
-## Deployment
+Na raiz do projeto:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- `docker-compose up --build`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+No backend em produção local:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- `npm run start:prod:migrate`
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Variáveis principais (`/.env`)
 
-## Resources
+- Runtime: `APP_ENV`, `PORT`, `APP_LOGGER_ENABLED`.
+- CORS/CSP: `CORS_ALLOWED_ORIGINS`, `NEXT_PUBLIC_FRONTEND_URL`, `CSP_*`.
+- Upload: `UPLOADS_DIR`, `UPLOAD_MAX_FILE_SIZE_MB`, `UPLOAD_ALLOWED_MIME_TYPES`.
+- Auth: `JWT_*`, `AUTH_JWE_*`, `AUTH_COOKIE_*`, `CSRF_ENABLED`, `AUTH_PROVIDER`, `FIREBASE_*`.
+- Mensageria: `RABBITMQ_URL`, `RABBITMQ_PAYMENT_QUEUE`, `RABBITMQ_PAYMENT_DLQ`, `RABBITMQ_PREFETCH`.
+- Pagamento: `PAYMENT_PROVIDER`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
+- Créditos: `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_*`.
+- Referência pronta para bootstrap local: `/.env.example`.
 
-Check out a few resources that may come in handy when working with NestJS:
+### Deploy Railway
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Arquivo de suporte: `backend/railway.toml`.
+- Runbook completo: [../docs/deploy/railway.md](../docs/deploy/railway.md)
 
-## Support
+</details>
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🇺🇸 English Description
+<details>
+<summary><strong>View Details</strong></summary>
 
-## Stay in touch
+### Overview
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+NestJS backend with layered architecture (DDD + SOLID + Clean Code), Prisma persistence, and asynchronous payment flow using outbox + RabbitMQ + worker.
 
-## License
+### Core responsibilities
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Authentication and authorization with JWT/JWE.
+- Secure session with HttpOnly cookies (access/refresh) + CSRF protection.
+- RBAC for `ADMIN` and `USER`.
+- Movie CRUD (admin) and purchased movies delivery.
+- Full credits system (balance, ledger, plan checkout, and mixed referrals).
+- User profile management (profile updates, strong-password change, avatar upload).
+- Admin credit management (plan CRUD + global bonus/referral config).
+- Strict upload validation (type/size).
+- Async payment with `mock` mode and real Stripe support through signed webhook.
+- Centralized logging with `nestjs-pino` and `ApiLogger`.
+
+### Layered structure
+
+- `src/domain`: entities and repository contracts.
+- `src/application`: business rules and use cases.
+- `src/infrastructure`: Prisma, gateways, messaging, auth providers.
+- `src/presentation`: HTTP controllers and RMQ workers.
+- `src/shared`: reusable cross-cutting components.
+
+### Implemented enterprise security
+
+- Helmet with environment-driven CSP (`CSP_ENABLED`, `CSP_REPORT_ONLY`, `CSP_CONNECT_SRC`).
+- Credentialed CORS for cookie-based authentication.
+- DTO validation with `class-validator`/`class-transformer`.
+- JWT guard reading token from cookie with controlled header fallback.
+- Double-submit CSRF (`cine_csrf_token` + `x-csrf-token` header).
+- Global rate limiting.
+
+### Implemented professional payment flow
+
+- Checkout writes purchase + outbox event in one transaction.
+- Outbox dispatcher publishes pending events with timeout and retries.
+- Worker processes queue asynchronously with progressive retry.
+- DLQ strategy for terminal failures (`RABBITMQ_PAYMENT_DLQ`).
+- Signed Stripe webhook endpoint (`/payments/webhook/stripe`) for official confirmation.
+- Parallel credits async path: `credit_purchase_outbox` + `CreditOutboxDispatcher` + `CreditPaymentWorker` (`credit.checkout.requested` event).
+
+### Run locally (without Docker)
+
+1. `npm install`
+2. `npm run prisma:generate`
+3. `npm run prisma:migrate:deploy`
+4. `npm run start:dev`
+
+### Run with Docker (recommended)
+
+From project root:
+
+- `docker-compose up --build`
+
+Backend production-local bootstrap:
+
+- `npm run start:prod:migrate`
+
+### Main env variables (`/.env`)
+
+- Runtime: `APP_ENV`, `PORT`, `APP_LOGGER_ENABLED`.
+- CORS/CSP: `CORS_ALLOWED_ORIGINS`, `NEXT_PUBLIC_FRONTEND_URL`, `CSP_*`.
+- Upload: `UPLOADS_DIR`, `UPLOAD_MAX_FILE_SIZE_MB`, `UPLOAD_ALLOWED_MIME_TYPES`.
+- Auth: `JWT_*`, `AUTH_JWE_*`, `AUTH_COOKIE_*`, `CSRF_ENABLED`, `AUTH_PROVIDER`, `FIREBASE_*`.
+- Messaging: `RABBITMQ_URL`, `RABBITMQ_PAYMENT_QUEUE`, `RABBITMQ_PAYMENT_DLQ`, `RABBITMQ_PREFETCH`.
+- Payment: `PAYMENT_PROVIDER`, `PAYMENT_MAX_RETRIES`, `PAYMENT_OUTBOX_*`, `STRIPE_*`.
+- Credits: `CREDIT_PAYMENT_MAX_RETRIES`, `CREDIT_OUTBOX_*`.
+- Ready-to-copy bootstrap reference: `/.env.example`.
+
+### Railway deployment
+
+- Support file: `backend/railway.toml`.
+- Full runbook: [../docs/deploy/railway.md](../docs/deploy/railway.md)
+
+</details>

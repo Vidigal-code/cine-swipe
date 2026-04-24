@@ -1,0 +1,10 @@
+import { ConfigService } from '@nestjs/config';
+import type { CookieOptions } from 'express';
+export declare const ACCESS_TOKEN_COOKIE = "cine_access_token";
+export declare const REFRESH_TOKEN_COOKIE = "cine_refresh_token";
+export declare const CSRF_TOKEN_COOKIE = "cine_csrf_token";
+export declare const CSRF_HEADER_NAME = "x-csrf-token";
+type CookieType = 'access' | 'refresh' | 'csrf';
+export declare function buildCookieOptions(configService: ConfigService, type: CookieType): CookieOptions;
+export declare function csrfEnabled(configService: ConfigService): boolean;
+export {};

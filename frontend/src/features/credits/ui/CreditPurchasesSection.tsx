@@ -1,0 +1,41 @@
+import type { CreditPurchase } from '@/entities/credit/model/types';
+import type { PaginationMeta } from '@/entities/movie/model/types';
+import { PaginationControls } from '@/shared/ui/pagination/PaginationControls';
+import { resolveCreditPurchaseStatusLabel } from '@/entities/credit/model/credit-labels.pt-br';
+
+interface CreditPurchasesSectionProps {
+  title: string;
+  entries: CreditPurchase[];
+  meta?: PaginationMeta;
+  onPageChange: (page: number) => void;
+}
+
+export function CreditPurchasesSection({
+  title,
+  entries,
+  meta,
+  onPageChange,
+}: CreditPurchasesSectionProps) {
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 min-h-[16rem]">
+      <h2 className="text-xl font-semibold text-card-foreground text-center mb-4">
+        {title}
+      </h2>
+      <div className="space-y-2">
+        {entries.map((entry) => (
+          <div
+            key={entry.id}
+            className="rounded-lg border border-border bg-background p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between text-center sm:text-left gap-2"
+          >
+            <span className="text-sm text-muted-foreground">Plano {entry.creditPlanId}</span>
+            <span className="font-semibold">
+              {entry.creditsAmount} créditos -{' '}
+              {resolveCreditPurchaseStatusLabel(entry.status)}
+            </span>
+          </div>
+        ))}
+      </div>
+      {meta && <PaginationControls meta={meta} onPageChange={onPageChange} />}
+    </section>
+  );
+}
