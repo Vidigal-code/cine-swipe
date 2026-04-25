@@ -29,10 +29,10 @@ Este guia adiciona suporte de deploy no Railway sem perder o modo principal do p
 #### Variáveis obrigatórias
 
 - `PORT` (Railway injeta automaticamente)
-- `DATABASE_URL`
-- `RABBITMQ_URL`
-- `RABBITMQ_PAYMENT_QUEUE`
-- `RABBITMQ_PAYMENT_DLQ`
+- `DATABASE_URL` (obrigatória quando `DATABASE_PROVIDER=postgres` e/ou comando `start:prod:migrate`)
+- `RABBITMQ_URL` (obrigatória quando `PAYMENT_FLOW_MODE=rmq`)
+- `RABBITMQ_PAYMENT_QUEUE` (obrigatória quando `PAYMENT_FLOW_MODE=rmq`)
+- `RABBITMQ_PAYMENT_DLQ` (obrigatória quando `PAYMENT_FLOW_MODE=rmq`)
 - `JWT_SECRET`
 - `AUTH_JWE_SECRET`
 - `CORS_ALLOWED_ORIGINS`
@@ -67,9 +67,11 @@ Este guia adiciona suporte de deploy no Railway sem perder o modo principal do p
 
 #### Comando de start
 
-- `npm run start:prod:migrate`
-
-Esse comando garante `prisma generate` + `prisma migrate deploy` antes do bootstrap do Nest.
+- Matriz explícita (Firebase sem Postgres incluso):
+  - `DATABASE_PROVIDER=postgres` -> `npm run start:prod:migrate`
+  - `DATABASE_PROVIDER=firestore` ou `DATABASE_PROVIDER=realtime` -> `npm run start:prod`
+- `backend/railway.toml` usa `start:prod:migrate` como padrão compatível com Postgres.
+- Se o banco ativo no deploy for Firebase (`firestore`/`realtime`), sobrescreva o Start Command do serviço para `npm run start:prod`.
 
 ### Serviço frontend (Railway)
 
@@ -92,7 +94,7 @@ Esse comando garante `prisma generate` + `prisma migrate deploy` antes do bootst
 
 ### Checklist de validação pós-deploy
 
-- [ ] Backend sobe com migrações Prisma aplicadas.
+- [ ] Backend sobe com comando compatível ao provider (`start:prod:migrate` para `postgres` ou `start:prod` para `firestore/realtime`).
 - [ ] Frontend consome API pública correta (`NEXT_PUBLIC_API_URL`).
 - [ ] Login/cadastro funcionam via cookie HttpOnly + CSRF.
 - [ ] Checkout `mock` funciona com fila assíncrona.
@@ -133,10 +135,10 @@ This runbook adds Railway deployment support while preserving the default projec
 #### Required variables
 
 - `PORT` (injected by Railway)
-- `DATABASE_URL`
-- `RABBITMQ_URL`
-- `RABBITMQ_PAYMENT_QUEUE`
-- `RABBITMQ_PAYMENT_DLQ`
+- `DATABASE_URL` (required when `DATABASE_PROVIDER=postgres` and/or using `start:prod:migrate`)
+- `RABBITMQ_URL` (required when `PAYMENT_FLOW_MODE=rmq`)
+- `RABBITMQ_PAYMENT_QUEUE` (required when `PAYMENT_FLOW_MODE=rmq`)
+- `RABBITMQ_PAYMENT_DLQ` (required when `PAYMENT_FLOW_MODE=rmq`)
 - `JWT_SECRET`
 - `AUTH_JWE_SECRET`
 - `CORS_ALLOWED_ORIGINS`
@@ -171,9 +173,11 @@ This runbook adds Railway deployment support while preserving the default projec
 
 #### Start command
 
-- `npm run start:prod:migrate`
-
-This ensures `prisma generate` + `prisma migrate deploy` before Nest bootstrap.
+- Explicit matrix (including Firebase DB without Postgres):
+  - `DATABASE_PROVIDER=postgres` -> `npm run start:prod:migrate`
+  - `DATABASE_PROVIDER=firestore` or `DATABASE_PROVIDER=realtime` -> `npm run start:prod`
+- `backend/railway.toml` keeps `start:prod:migrate` as the Postgres-friendly default.
+- If production deploy uses Firebase as the active database (`firestore`/`realtime`), override the service Start Command to `npm run start:prod`.
 
 ### Frontend service (Railway)
 
@@ -196,7 +200,7 @@ This ensures `prisma generate` + `prisma migrate deploy` before Nest bootstrap.
 
 ### Post-deploy validation checklist
 
-- [ ] Backend starts with Prisma migrations applied.
+- [ ] Backend starts with provider-compatible command (`start:prod:migrate` for `postgres` or `start:prod` for `firestore/realtime`).
 - [ ] Frontend points to correct API (`NEXT_PUBLIC_API_URL`).
 - [ ] Login/register works with HttpOnly cookie + CSRF.
 - [ ] `mock` checkout works through async queue.

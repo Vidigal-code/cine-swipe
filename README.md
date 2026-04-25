@@ -72,6 +72,12 @@ Se ocorrer erro intermitente de pull no Docker Hub (por exemplo `TLS handshake t
   - Stripe: `PAYMENT_PROVIDER=stripe` + `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`.
   - Emulador Firebase Auth opcional em local: `FIREBASE_AUTH_EMULATOR_HOST=host.docker.internal:9099`.
 
+### Decisão do trailer (escopo do desafio)
+
+- Decisão adotada: trailer por URL (YouTube) no campo `trailerUrl`.
+- O fluxo principal não faz upload binário de vídeo para trailer.
+- Justificativas técnicas: menor custo de armazenamento/CDN, menor complexidade operacional e de segurança, melhor performance de upload/deploy, e aderência ao escopo do desafio (janela de 2 dias).
+
 ### Deploy (Railway)
 
 - O projeto mantém foco local com Docker e também inclui suporte Railway.
@@ -161,6 +167,12 @@ If you hit intermittent Docker Hub pull errors (for example `TLS handshake timeo
   - Firebase Auth/Database/CDN: configure `FIREBASE_*` (`FIREBASE_DATABASE_URL`, `FIREBASE_STORAGE_BUCKET`, etc.).
   - Stripe: `PAYMENT_PROVIDER=stripe` + `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`.
   - Optional local Firebase Auth emulator: `FIREBASE_AUTH_EMULATOR_HOST=host.docker.internal:9099`.
+
+### Trailer decision (challenge scope)
+
+- Chosen approach: trailer by URL (YouTube) in the `trailerUrl` field.
+- The main flow does not perform binary video upload for trailers.
+- Technical rationale: lower storage/CDN cost, lower operational and security complexity, faster upload/deploy performance, and better fit for the 2-day challenge scope.
 
 ### Deploy (Railway)
 

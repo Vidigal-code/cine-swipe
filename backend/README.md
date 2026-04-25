@@ -72,7 +72,8 @@ Na raiz do projeto:
 
 No backend em produção local:
 
-- `npm run start:prod:migrate`
+- `npm run start:prod:migrate` (quando `DATABASE_PROVIDER=postgres`, padrão local)
+- `npm run start:prod` (quando `DATABASE_PROVIDER=firestore|realtime`)
 
 ### Variáveis principais (`/.env`)
 
@@ -104,8 +105,11 @@ No backend em produção local:
 
 ### Observações de bootstrap
 
-- O comando `start:prod:migrate` mantém compatibilidade Docker-first e executa pipeline Prisma antes do bootstrap do Nest.
-- Em modo Firebase (`firestore`/`realtime`), o Prisma não é usado como repositório ativo em runtime, mas o projeto continua compatível com o fluxo operacional padrão.
+- Regra de start command no deploy:
+  - `DATABASE_PROVIDER=postgres` -> `npm run start:prod:migrate` (executa `prisma generate` + `prisma migrate deploy` antes do bootstrap Nest).
+  - `DATABASE_PROVIDER=firestore` ou `DATABASE_PROVIDER=realtime` -> `npm run start:prod` (evita dependência operacional de migração Prisma no boot).
+- `backend/railway.toml` mantém `start:prod:migrate` como padrão Docker-first.
+- Se o deploy usar Firebase como banco ativo, sobrescreva o Start Command do serviço para `npm run start:prod`.
 
 ### Deploy Railway
 
@@ -186,7 +190,8 @@ From project root:
 
 Backend production-local bootstrap:
 
-- `npm run start:prod:migrate`
+- `npm run start:prod:migrate` (when `DATABASE_PROVIDER=postgres`, local default)
+- `npm run start:prod` (when `DATABASE_PROVIDER=firestore|realtime`)
 
 ### Main env variables (`/.env`)
 
@@ -218,8 +223,11 @@ Backend production-local bootstrap:
 
 ### Bootstrap notes
 
-- `start:prod:migrate` preserves Docker-first compatibility and runs Prisma pipeline before Nest startup.
-- In Firebase database mode (`firestore`/`realtime`), Prisma is not the active runtime repository, while operational bootstrap remains consistent.
+- Start command rule for deploy:
+  - `DATABASE_PROVIDER=postgres` -> `npm run start:prod:migrate` (runs `prisma generate` + `prisma migrate deploy` before Nest bootstrap).
+  - `DATABASE_PROVIDER=firestore` or `DATABASE_PROVIDER=realtime` -> `npm run start:prod` (avoids an operational Prisma migration dependency at boot time).
+- `backend/railway.toml` keeps `start:prod:migrate` as the Docker-first default.
+- If production deploy uses Firebase as the active database, override the service Start Command to `npm run start:prod`.
 
 ### Railway deployment
 
