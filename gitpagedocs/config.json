@@ -1,25 +1,25 @@
 {
   "site": {
-    "name": "CineSwipe",
-    "defaultLanguage": "pt",
+    "name": "Git Pages Docs",
+    "defaultLanguage": "en",
     "supportedLanguages": [
       "en",
       "pt",
       "es"
     ],
-    "HideThemeSelector": true,
-    "ThemeDefault": "duet-dark",
+    "HideThemeSelector": false,
+    "ThemeDefault": "aurora-dark",
     "ThemeModeDefault": "dark",
     "ActiveNavigation": true,
     "FocusMode": true,
     "FooterEnabled": true,
-    "FooterLinkName": "CineSwipe",
+    "FooterLinkName": "GitPageDocs",
     "FooterLinkUrl": "https://github.com/vidigal-code/cine-swipe",
     "FooterDateMode": "browser",
     "FooterDateCustom": "",
     "ProjectLink": "https://github.com/vidigal-code/cine-swipe",
     "SiteIconPath": "/icon.svg",
-    "SiteHeaderName": "CineSwipe",
+    "SiteHeaderName": "Git Pages Docs",
     "IconImageMenuHeaderImgWidth": 20,
     "IconImageMenuHeaderImgHeight": 20,
     "IconImageMenuHeaderLightImg": "",
@@ -129,13 +129,32 @@
     "IconDocsLockImgHeight": 20,
     "RouteguideBrandPositionDefault": "center",
     "RouteguideBrandContainerTopDefault": false,
-    "audioPlayerEnabled": false,
+    "audioPlayerEnabled": true,
     "audioAutoPlayOnLoad": false,
     "audioLoopEnabled": false,
     "audioSequentialPlayback": false,
     "audioPopoverHideSource": false,
     "audioPopoverShowMinutes": true,
-    "audioTracks": [],
+    "audioTracks": [
+      {
+        "url": "https://www.youtube.com/watch?v=xAR6N9N8e6U",
+        "type": "youtube",
+        "title": {
+          "pt": "Youtube",
+          "en": "Youtube",
+          "es": "Youtube"
+        }
+      },
+      {
+        "url": "https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh",
+        "type": "spotify",
+        "title": {
+          "pt": "Spotify",
+          "en": "Spotify",
+          "es": "Spotify"
+        }
+      }
+    ],
     "IconAudioPlayReactIcones": true,
     "IconAudioPlayReactIconesTag": "CiPlay1",
     "IconAudioPlayReactIconesTagColorDark": "White",
@@ -665,13 +684,13 @@
   "VersionControl": {
     "versions": [
       {
-        "id": "1.0.0",
-        "path": "gitpagedocs/docs/versions/1.0.0/config.json",
+        "id": "1.1.56",
+        "path": "gitpagedocs/docs/versions/1.1.56/config.json",
         "ProjectLink": "https://github.com/vidigal-code/cine-swipe",
-        "PathConfig": "gitpagedocs/docs/versions/1.0.0/config.json",
+        "PathConfig": "gitpagedocs/docs/versions/1.1.56/config.json",
         "PreviewProject": "",
-        "UpdateDate": "2026-08-18",
-        "branch": "main",
+        "UpdateDate": "",
+        "branch": "",
         "release": "",
         "commit": "",
         "source-viewer": true,

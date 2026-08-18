@@ -1,0 +1,110 @@
+name: Deploy GitPageDocs
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    env:
+      GITHUB_ACTIONS: "true"
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITPAGEDOCS_REPOSITORY_SEARCH: "true"
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Prepare runtime source
+        run: |
+          git clone --depth 1 https://github.com/Vidigal-code/git-page-docs.git .gitpagedocs-runtime
+          cp .gitpagedocs-runtime/gitpagedocs/icon.svg /tmp/default-icon.svg 2>/dev/null || true
+          if [ -d gitpagelayouts ]; then
+            rm -rf .gitpagedocs-runtime/gitpagelayouts
+            cp -R gitpagelayouts .gitpagedocs-runtime/gitpagelayouts
+          fi
+          if [ -d gitpagedocs ]; then
+            rm -rf .gitpagedocs-runtime/gitpagedocs
+            cp -R gitpagedocs .gitpagedocs-runtime/gitpagedocs
+          fi
+          mkdir -p .gitpagedocs-runtime/public
+          if [ -f icon.svg ]; then
+            cp icon.svg .gitpagedocs-runtime/public/icon.svg
+          elif [ -f gitpagedocs/icon.svg ]; then
+            cp gitpagedocs/icon.svg .gitpagedocs-runtime/public/icon.svg
+          elif [ -f /tmp/default-icon.svg ]; then
+            cp /tmp/default-icon.svg .gitpagedocs-runtime/public/icon.svg
+          fi
+
+      - name: Install runtime dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .gitpagedocs-runtime
+
+      - name: Build static site with target repository path
+        run: pnpm exec next build frontend && mv frontend/out out
+        working-directory: .gitpagedocs-runtime
+        env:
+          GITPAGEDOCS_PATH: "docs"
+
+      - name: Relocate output to custom docs path
+        run: |
+          mkdir -p .gitpagedocs-runtime/out_new/docs
+          mv .gitpagedocs-runtime/out/* .gitpagedocs-runtime/out_new/docs/
+          rm -rf .gitpagedocs-runtime/out
+          mv .gitpagedocs-runtime/out_new .gitpagedocs-runtime/out
+
+      - name: Redirect site root to custom docs path
+        run: printf '%s' '<!doctype html><meta http-equiv="refresh" content="0; url=./docs/"><title>Redirecting</title><a href="./docs/">Documentation</a>' > .gitpagedocs-runtime/out/index.html
+
+      - name: Add .nojekyll
+        run: touch .gitpagedocs-runtime/out/.nojekyll 2>/dev/null || mkdir -p .gitpagedocs-runtime/out && touch .gitpagedocs-runtime/out/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./.gitpagedocs-runtime/out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 900000
+          error_count: 30
+          reporting_interval: 10000
