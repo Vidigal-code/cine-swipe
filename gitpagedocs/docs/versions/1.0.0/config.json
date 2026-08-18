@@ -1,0 +1,474 @@
+{
+  "auth": {
+    "accessKeys": {
+      "docs-key": "open-gitpagedocs-docs"
+    },
+    "rolesStorageKey": "git-page-docs:route-auth:roles",
+    "providers": [
+      {
+        "type": "authjs",
+        "enabled": true,
+        "sessionEndpoint": "/api/auth/session",
+        "rolesClaimPath": "user.roles"
+      },
+      {
+        "type": "clerk",
+        "enabled": true,
+        "rolesClaimPath": "claims.publicMetadata.roles"
+      },
+      {
+        "type": "firebase",
+        "enabled": true,
+        "tokenStorageKey": "git-page-docs:firebase-token",
+        "rolesClaimPath": "roles"
+      },
+      {
+        "type": "jwt",
+        "enabled": true,
+        "tokenStorageKey": "git-page-docs:jwt-token",
+        "rolesClaimPath": "roles"
+      }
+    ]
+  },
+  "routes-md": [
+    {
+      "id": 1,
+      "title": {
+        "pt": "Primeiros passos",
+        "en": "Getting Started",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "pt": "Instale e rode o CineSwipe localmente",
+        "en": "Install and run CineSwipe locally",
+        "es": "Instala y ejecuta CineSwipe localmente"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/getting-started.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/getting-started.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/getting-started.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 2,
+      "title": {
+        "pt": "Visão geral do projeto",
+        "en": "Project overview",
+        "es": "Visión general del proyecto"
+      },
+      "description": {
+        "pt": "O que é o CineSwipe, stack e estrutura do repositório",
+        "en": "What CineSwipe is, stack and repository structure",
+        "es": "Qué es CineSwipe, stack y estructura del repositorio"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-overview.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-overview.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/project-overview.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 3,
+      "title": {
+        "pt": "Frontend",
+        "en": "Frontend",
+        "es": "Frontend"
+      },
+      "description": {
+        "pt": "Telas, experiência de swipe e integração com a API",
+        "en": "Screens, swipe experience and API integration",
+        "es": "Pantallas, experiencia de swipe e integración con la API"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/frontend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/frontend.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 4,
+      "title": {
+        "pt": "Backend e API",
+        "en": "Backend and API",
+        "es": "Backend y API"
+      },
+      "description": {
+        "pt": "Arquitetura, módulos e endpoints da API NestJS",
+        "en": "Architecture, modules and NestJS API endpoints",
+        "es": "Arquitectura, módulos y endpoints de la API NestJS"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/backend-api.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/backend-api.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/backend-api.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 5,
+      "title": {
+        "pt": "Pagamentos e créditos",
+        "en": "Payments and credits",
+        "es": "Pagos y créditos"
+      },
+      "description": {
+        "pt": "Stripe, webhooks, outbox e sistema de créditos",
+        "en": "Stripe, webhooks, outbox and the credit system",
+        "es": "Stripe, webhooks, outbox y el sistema de créditos"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/payments-credits.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/payments-credits.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/payments-credits.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 6,
+      "title": {
+        "pt": "Configuração",
+        "en": "Configuration",
+        "es": "Configuración"
+      },
+      "description": {
+        "pt": "Variáveis de ambiente e integrações externas",
+        "en": "Environment variables and external integrations",
+        "es": "Variables de entorno e integraciones externas"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/configuration.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/configuration.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/configuration.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 7,
+      "title": {
+        "pt": "Deploy",
+        "en": "Deployment",
+        "es": "Despliegue"
+      },
+      "description": {
+        "pt": "Docker, Railway, migrações e seed",
+        "en": "Docker, Railway, migrations and seed",
+        "es": "Docker, Railway, migraciones y seed"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/deployment.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/deployment.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/deployment.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    }
+  ],
+  "routes-source-viewer": [
+    {
+      "id": 8,
+      "title": {
+        "pt": "Código fonte",
+        "en": "Source code",
+        "es": "Código fuente"
+      },
+      "description": {
+        "pt": "Explore a árvore do repositório, navegue por pastas e visualize arquivos diretamente na documentação.",
+        "en": "Explore the repository tree, browse folders, and preview files directly inside the documentation.",
+        "es": "Explora el árbol del repositorio, navega por carpetas y previsualiza archivos directamente en la documentación."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "fullscreenEnabled": false,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": false,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false,
+      "source-viewer": true,
+      "source-viewer-path": "https://github.com/vidigal-code/cine-swipe/tree/HEAD"
+    }
+  ],
+  "routes-html": [],
+  "routes-video": [],
+  "routes-audio": [],
+  "menus-header-md": [
+    {
+      "id": 1,
+      "pt": {
+        "title": "Primeiros passos",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/getting-started.md"
+      },
+      "en": {
+        "title": "Getting Started",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/getting-started.md"
+      },
+      "es": {
+        "title": "Primeros pasos",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/getting-started.md"
+      }
+    },
+    {
+      "id": 2,
+      "pt": {
+        "title": "Visão geral do projeto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-overview.md"
+      },
+      "en": {
+        "title": "Project overview",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-overview.md"
+      },
+      "es": {
+        "title": "Visión general del proyecto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-overview.md"
+      }
+    },
+    {
+      "id": 3,
+      "pt": {
+        "title": "Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/frontend.md"
+      },
+      "en": {
+        "title": "Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/frontend.md"
+      },
+      "es": {
+        "title": "Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
+      }
+    },
+    {
+      "id": 4,
+      "pt": {
+        "title": "Backend e API",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/backend-api.md"
+      },
+      "en": {
+        "title": "Backend and API",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/backend-api.md"
+      },
+      "es": {
+        "title": "Backend y API",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/backend-api.md"
+      }
+    },
+    {
+      "id": 5,
+      "pt": {
+        "title": "Pagamentos e créditos",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/payments-credits.md"
+      },
+      "en": {
+        "title": "Payments and credits",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/payments-credits.md"
+      },
+      "es": {
+        "title": "Pagos y créditos",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/payments-credits.md"
+      }
+    },
+    {
+      "id": 6,
+      "pt": {
+        "title": "Configuração",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/configuration.md"
+      },
+      "en": {
+        "title": "Configuration",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/configuration.md"
+      },
+      "es": {
+        "title": "Configuración",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/configuration.md"
+      }
+    },
+    {
+      "id": 7,
+      "pt": {
+        "title": "Deploy",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/deployment.md"
+      },
+      "en": {
+        "title": "Deployment",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/deployment.md"
+      },
+      "es": {
+        "title": "Despliegue",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/deployment.md"
+      }
+    }
+  ],
+  "menus-header-source-viewer": [
+    {
+      "id": 8,
+      "pt": {
+        "title": "Código fonte",
+        "path-click": "page:8"
+      },
+      "en": {
+        "title": "Source code",
+        "path-click": "page:8"
+      },
+      "es": {
+        "title": "Código fuente",
+        "path-click": "page:8"
+      }
+    }
+  ],
+  "menus-header-html": [],
+  "menus-header-video": [],
+  "menus-header-audio": [],
+  "hierarchyPage": {
+    "md": 0,
+    "source-viewer": 1,
+    "html": 2,
+    "video": 3,
+    "audio": 4
+  },
+  "hierarchyMenu": {
+    "md": 0,
+    "source-viewer": 1,
+    "html": 2,
+    "video": 3,
+    "audio": 4
+  }
+}
