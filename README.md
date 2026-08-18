@@ -1,3 +1,4 @@
+
 # Cine-Swipe
 
 ## 🇧🇷 Descrição em Português
