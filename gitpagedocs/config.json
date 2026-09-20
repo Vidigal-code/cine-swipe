@@ -432,7 +432,9 @@
         "docsAccessBlockPopupTitle": "Bloquear a documentação?",
         "docsAccessBlockPopupDesc": "Você precisará da senha novamente na próxima visita.",
         "docsAccessBlockConfirmBtn": "Sim, bloquear",
-        "docsAccessBlockCancelBtn": "Cancelar"
+        "docsAccessBlockCancelBtn": "Cancelar",
+        "sourceViewerEntryHint": "Explore os arquivos de um repositorio sem abrir a documentacao.",
+        "sourceViewerEntryAction": "Abrir o visualizador de codigo"
       },
       "en": {
         "pt": "Portuguese",
@@ -545,7 +547,9 @@
         "docsAccessBlockPopupTitle": "Block the documentation?",
         "docsAccessBlockPopupDesc": "You'll need the password again on your next visit.",
         "docsAccessBlockConfirmBtn": "Yes, block",
-        "docsAccessBlockCancelBtn": "Cancel"
+        "docsAccessBlockCancelBtn": "Cancel",
+        "sourceViewerEntryHint": "Browse a repository's files without opening its documentation.",
+        "sourceViewerEntryAction": "Open the source viewer"
       },
       "es": {
         "pt": "Portugues",
@@ -658,7 +662,9 @@
         "docsAccessBlockPopupTitle": "¿Bloquear la documentación?",
         "docsAccessBlockPopupDesc": "Tendrás que introducir la contraseña de nuevo en la próxima visita.",
         "docsAccessBlockConfirmBtn": "Sí, bloquear",
-        "docsAccessBlockCancelBtn": "Cancelar"
+        "docsAccessBlockCancelBtn": "Cancelar",
+        "sourceViewerEntryHint": "Explora los archivos de un repositorio sin abrir la documentacion.",
+        "sourceViewerEntryAction": "Abrir el visor de codigo"
       }
     }
   },
