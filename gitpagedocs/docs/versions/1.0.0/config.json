@@ -470,5 +470,21 @@
     "html": 2,
     "video": 3,
     "audio": 4
+  },
+  "routeDefaults": {
+    "titleCss": "font-size: 1.85rem; font-weight: 700;",
+    "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+    "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+    "titlePosition": "center",
+    "titleIsVisible": true,
+    "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+    "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+    "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+    "descriptionPosition": "center",
+    "descriptionIsVisible": true,
+    "marginTop": "",
+    "marginBottom": "",
+    "blockLink": true,
+    "browseAll": false
   }
 }

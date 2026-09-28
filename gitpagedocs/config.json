@@ -666,7 +666,145 @@
         "sourceViewerEntryHint": "Explora los archivos de un repositorio sin abrir la documentacion.",
         "sourceViewerEntryAction": "Abrir el visor de codigo"
       }
-    }
+    },
+    "languages": {
+      "en": true,
+      "pt": true,
+      "es": true
+    },
+    "icons": {
+      "defaults": {
+        "reactIcon": true,
+        "colorDark": "White",
+        "colorLight": "black",
+        "size": "25px",
+        "imgDark": "",
+        "imgLight": "",
+        "imgWidth": 20,
+        "imgHeight": 20
+      },
+      "ImageMenuHeader": {
+        "tag": "FaGithubAlt"
+      },
+      "ProjectLink": {
+        "tag": "FaGithubAlt",
+        "size": null
+      },
+      "VersionLinks": {
+        "tag": "FaCodeBranch"
+      },
+      "InfoHeaderMenu": {
+        "tag": "BsInfoSquareFill"
+      },
+      "PreviewProjectLink": {
+        "tag": "CiGlobe"
+      },
+      "NavMenuOpen": {
+        "tag": "FaBars"
+      },
+      "NavMenuClose": {
+        "tag": "IoMdClose"
+      },
+      "NavMenuMobileOpen": {
+        "tag": "FaBars"
+      },
+      "NavMenuMobileClose": {
+        "tag": "IoMdClose"
+      },
+      "NavMenuBlockActive": {
+        "tag": "FiLock"
+      },
+      "NavMenuBlockInactive": {
+        "tag": "FiUnlock"
+      },
+      "DocsLock": {
+        "tag": "FiLock",
+        "size": "22px"
+      },
+      "AudioPlay": {
+        "tag": "CiPlay1",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "AudioPause": {
+        "tag": "FaPause",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "AudioPlayerPopoverClose": {
+        "tag": "IoMdClose"
+      },
+      "AudioPlayerPopoverPlay": {
+        "tag": "CiPlay1"
+      },
+      "AudioPlayerPopoverPause": {
+        "tag": "FaPause"
+      },
+      "AudioPlayerPopoverRestart": {
+        "tag": "FiRefreshCw"
+      },
+      "AudioPlayerPopoverLoopOn": {
+        "tag": "FiRepeat"
+      },
+      "AudioPlayerPopoverLoopOff": {
+        "tag": "FiRepeat"
+      },
+      "AiChatOpen": {
+        "tag": "BsRobot",
+        "size": "22px"
+      },
+      "AiChatClose": {
+        "tag": "IoMdClose",
+        "size": "22px"
+      },
+      "AiChatSettings": {
+        "tag": "FiSettings",
+        "size": "20px"
+      },
+      "AiChatSend": {
+        "tag": "FiSend",
+        "size": "20px"
+      },
+      "AiChatCancel": {
+        "tag": "FiXCircle",
+        "size": "20px"
+      },
+      "AiChatTrash": {
+        "tag": "FiTrash2",
+        "size": "20px"
+      },
+      "AiChatClearChat": {
+        "tag": "FiMessageSquare",
+        "size": "20px"
+      },
+      "AiChatClearData": {
+        "tag": "FiDatabase",
+        "size": "20px"
+      },
+      "AiChatExpand": {
+        "tag": "FiMaximize2",
+        "size": "20px"
+      },
+      "AiChatCollapse": {
+        "tag": "FiMinimize2",
+        "size": "20px"
+      },
+      "SidebarCollapse": {
+        "tag": "FiChevronsLeft",
+        "size": "22px"
+      },
+      "SidebarExpand": {
+        "tag": "FiChevronsRight",
+        "size": "22px"
+      }
+    },
+    "AiChatAutoLockSeconds": 30,
+    "layoutsConfigPath": "",
+    "layoutsConfigPathTemplates": ""
   },
   "VersionControl": {
     "versions": [
