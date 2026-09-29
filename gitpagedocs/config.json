@@ -802,6 +802,7 @@
         "size": "22px"
       }
     },
+    "mediaExclusivePlayback": true,
     "AiChatAutoLockSeconds": 30,
     "layoutsConfigPath": "",
     "layoutsConfigPathTemplates": ""
