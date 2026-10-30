@@ -1,61 +1,28 @@
 # Pagamentos e créditos
 
-O CineSwipe tem dois fluxos de cobrança que compartilham a mesma infraestrutura: compra de **filmes** e compra de **planos de créditos**. Ambos suportam modo assíncrono (outbox + RabbitMQ) e síncrono, e gateway `mock` ou `stripe`.
+Catálogo de filmes com autenticação, perfil, administração, compra de filmes, carteira de créditos e indicações. Compra de filme cobra seu preço em dinheiro; não desconta a carteira. Créditos têm checkout e consumo próprios. Os modos mock e Stripe precisam ser distinguidos ao interpretar uma compra aprovada.
 
-## Fluxo de compra de filme
+## Fluxo e casos de falha
 
-1. `POST /payments/checkout` com `{movieId}` gera um `correlationId` (UUID) e resolve o provedor (`PAYMENT_PROVIDER`).
-2. **Modo `rmq`** (padrão): `Purchase` (PENDING) e a linha de outbox são gravados **na mesma transação**; a API responde imediatamente. **Modo `sync`**: o gateway é chamado inline e a resposta já vem COMPLETED ou FAILED.
-3. Cada passo grava uma linha de auditoria em `payment_audits`.
+1. Cadastro/login valida credenciais locais ou token Firebase e cria sessão. Cookies de acesso/refresh são HttpOnly; o cookie CSRF é legível pelo cliente e acompanha x-csrf-token conforme configuração. Refresh, logout, alteração de senha/perfil e avatar possuem endpoints próprios. A lista e o detalhe de filmes alimentam a navegação e o checkout.
 
-### Outbox dispatcher
+2. POST /payments/checkout recebe movieId e gera correlationId. No modo rmq, o repositório cria Purchase PENDING e outbox; no adaptador Prisma, ambos são gravados em transação. Dispatcher publica checkout.requested; worker chama o gateway, atualiza COMPLETED/FAILED e registra auditoria. Timeout, tentativas e DLQ são configuráveis. No modo sync, o gateway é chamado dentro da requisição.
 
-`presentation/workers/payment-outbox.dispatcher.ts` roda em intervalo (`PAYMENT_OUTBOX_DISPATCH_INTERVAL_MS`, padrão 3000 ms), publica lotes (`PAYMENT_OUTBOX_BATCH_SIZE`) na fila com timeout e marca como SENT. Em falha, incrementa `attempts` com backoff linear (`PAYMENT_OUTBOX_RETRY_DELAY_MS × attempts`) até `PAYMENT_OUTBOX_MAX_ATTEMPTS`; estourado o limite, emite `checkout.failed` para a DLQ.
+3. Webhook /payments/webhook/stripe valida assinatura usando o corpo bruto e STRIPE_WEBHOOK_SECRET. Eventos já processados são reconhecidos; payment_intent.succeeded/failed atualizam compras. purchaseKind direciona créditos. correlationId fornece chave de idempotência ao gateway; evento processado e ledger possuem controles adicionais. Inspecione cada adaptador antes de assumir a mesma atomicidade fora do Prisma.
 
-### Worker de pagamento
+4. Planos de créditos → /credits/checkout → outbox/worker próprios → aprovação → ledger e saldo. /credits/consume aplica débito e rejeita saldo insuficiente. Cadastro pode conceder bônus base e bônus por indicação. A primeira compra de créditos aprovada do indicado pode recompensar o indicador; configuração, correlações e logs de recompensa evitam repetir o benefício no fluxo previsto. Admins gerenciam usuários, planos/configuração e auditoria.
 
-`payment.worker.ts` consome `checkout.requested` com ack manual, ignora compras que não estão PENDING, chama o gateway e, em recusa, reenfileira até `PAYMENT_MAX_RETRIES` (padrão 3) antes de marcar FAILED e mover para a DLQ.
+## Arquivos relacionados
 
-## Gateways
+- [backend/src/application/payment/payment.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/payment/payment.service.ts)
+- [backend/src/application/credit/credit.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/credit/credit.service.ts)
+- [backend/src/presentation/workers/payment-outbox.dispatcher.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment-outbox.dispatcher.ts)
+- [backend/src/presentation/workers/payment.worker.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment.worker.ts)
+- [backend/src/shared/config/platform.config.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/shared/config/platform.config.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-- **Mock** (padrão): aguarda 1,5 s e aprova sempre — ideal para desenvolvimento.
-- **Stripe**: `paymentIntents.create` com `confirm: true`, método de teste `STRIPE_TEST_PAYMENT_METHOD` (padrão `pm_card_visa`), valor em centavos, `idempotencyKey = correlationId` e metadata `{purchaseId, correlationId, purchaseKind}`.
+## Navegação
 
-## Webhook do Stripe
-
-`POST /payments/webhook/stripe` (sem guard) valida a assinatura com `STRIPE_WEBHOOK_SECRET` usando o `rawBody`. O tratamento:
-
-1. Consulta `processed_webhook_events`; evento duplicado gera auditoria `WEBHOOK_DUPLICATE_IGNORED` e retorna.
-2. Trata `payment_intent.succeeded` e `payment_intent.payment_failed`.
-3. Roteia para o fluxo de créditos quando `metadata.purchaseKind === 'credit'`.
-4. Marca o evento como processado (`eventId` único).
-
-Idempotência em três camadas: `idempotencyKey` no Stripe, tabela de eventos processados e a constraint única `(userId, correlationId)` no ledger.
-
-## Auditoria
-
-Toda transição gera uma linha imutável em `payment_audits` com snapshot (nome do usuário, e-mail, título do filme), `eventType` (`CHECKOUT_REQUESTED`, `STATUS_UPDATED`, `RETRY_SCHEDULED`, `DLQ_MOVED`, `WEBHOOK_DUPLICATE_IGNORED`) e `source` (`API`, `WORKER`, `WEBHOOK`, `SYSTEM`). Admins visualizam em `/admin/audit`.
-
-## Sistema de créditos
-
-- **Planos**: administrados em `/admin/credits` (nome, quantidade, preço em BRL, ativo). O seed cria Bronze 300/R$ 19,90, Prata 800/R$ 44,90 e Ouro 1800/R$ 89,90.
-- **Compra**: `POST /credits/checkout` espelha o fluxo de filmes (outbox + fila própria de créditos, com variáveis `CREDIT_OUTBOX_*`).
-- **Aprovação**: status vira COMPLETED e o saldo é creditado via ledger com correlação `credit-purchase:<id>`; em seguida roda a recompensa de indicação.
-- **Ledger**: `adjustUserCredits()` roda em transação — se já existe transação com o mesmo `(userId, correlationId)`, retorna sem duplicar; calcula `balanceBefore`/`balanceAfter`, lança `INSUFFICIENT_CREDITS` se ficaria negativo e atualiza `User.creditsBalance`.
-- **Consumo**: `POST /credits/consume` faz um ajuste negativo; saldo insuficiente vira HTTP 400 com mensagem em pt-BR, exibida no frontend como popup de aviso.
-- **Bônus de cadastro**: todo usuário novo recebe `registrationBonusCredits` (padrão 250) com correlação `registration:<userId>:base`.
-
-## Indicações (referral)
-
-Cada usuário tem um `referralCode` único (`ref_` + 6 bytes hex). Com `referralEnabled`:
-
-- **Bônus do indicado** — no cadastro com código válido, o novo usuário ganha `refereeRegistrationBonusCredits` (uma vez, registrado em `ReferralRewardLog`). Autoindicação é rejeitada.
-- **Bônus do indicador** — na **primeira compra de créditos aprovada** do indicado, o indicador ganha `referrerFirstPurchaseBonusCredits`. A flag `firstApprovedCreditPurchaseDone` é virada atomicamente, garantindo recompensa única.
-
-Constraints únicas em `referral_reward_logs` garantem no máximo uma recompensa por tipo por par indicador/indicado.
-
-## Observação
-
-Comprar um **filme** não gasta créditos — o checkout de filme cobra o preço em BRL pelo gateway. A carteira de créditos é separada, e hoje seu único ponto de consumo é o endpoint genérico `/credits/consume` (usado pela simulação na tela de créditos).
-
-> Versão: 1.0.0
+- [Project guide](?menu=pt&lang=pt&id=9)
+- [Source reference](?menu=pt&lang=pt&id=10)

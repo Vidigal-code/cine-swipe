@@ -1,58 +1,51 @@
 # Frontend
 
-El frontend es una app Next.js 14 (App Router) en TypeScript con Tailwind CSS, organizada en Feature-Sliced Design (`app` / `widgets` / `features` / `entities` / `shared`), con alias de import `@/*` hacia `./src/*`.
+Catálogo de películas con autenticación, perfil, administración, compras, cartera de créditos y referidos. Comprar una película cobra su precio monetario; no descuenta créditos. Estos tienen checkout y consumo propios. Distinga modos mock y Stripe al interpretar compras aprobadas.
 
-## Rutas
+## Interfaz y estado
 
-| Ruta | Acceso | Descripción |
-|---|---|---|
-| `/` | Público | Catálogo "En Cartelera" paginado (12 por página) |
-| `/movie/[id]` | Público | Detalles de la película, tráiler incrustado y botón de compra (redirige a `/login` si no hay sesión) |
-| `/login` | Público | Formulario de inicio de sesión |
-| `/register` | Público | Registro con campo opcional de código de referido y validación de contraseña fuerte |
-| `/my-movies` | Autenticado | Películas compradas; con `?success=true` hace polling cada 3 s esperando la cola de pago |
-| `/credits` | Autenticado | Saldo, planes, extracto, compras de créditos y simulación de consumo de 500 créditos |
-| `/profile` | Autenticado | Nombre/e-mail, cambio de contraseña, avatar y código de referido propio |
-| `/admin` | ADMIN | CRUD de películas + upload de póster |
-| `/admin/audit` | ADMIN | Registro de auditoría de pagos |
-| `/admin/credits` | ADMIN | CRUD de planes de créditos y configuración global |
-| `/admin/users` | ADMIN | Gestión de usuarios (listar, crear, editar, rol, eliminar) |
+Backend TypeScript/NestJS 11 con Prisma 6.7/PostgreSQL, RabbitMQ, Firebase Admin y Stripe. Domain contiene entidades/puertos; application servicios; infrastructure repositorios, autenticación, gateways y mensajería; presentation controllers/workers. Frontend Next.js 14.2.35, React 18, Redux Toolkit y TanStack Query 5. local/firebase/hybrid seleccionan autenticación; la configuración de plataforma selecciona persistencia y procesamiento.
 
-La protección de las rutas admin en el frontend es solo client-side (redirección vía `useEffect`); la aplicación real de permisos ocurre en el backend (`RolesGuard`).
+Prisma relaciona User, Movie, Purchase, PaymentAudit, PaymentOutbox, CreditPlan, CreditSystemConfig, CreditTransaction, CreditPurchase, CreditPurchaseOutbox, ReferralRewardLog y ProcessedWebhookEvent. Secretos Stripe/Firebase quedan en backend. Configure cookies, CORS, CSRF y uploads para el dominio real. Una aprobación mock no confirma dinero; verifique saldo/historial en backend.
 
-## Providers y estado
+Registro/login valida credenciales locales o token Firebase y crea sesión. Cookies de acceso/refresh son HttpOnly; CSRF es legible por el cliente y acompaña x-csrf-token cuando está habilitado. Refresh, logout, contraseña/perfil y avatar tienen endpoints propios. Lista/detalle alimentan navegación y checkout.
 
-`app/providers/RootProvider.tsx` compone: `ThemeProvider` (dark mode por clase, clave de storage `cine-swipe-theme`) → Redux `Provider` → `QueryClientProvider` (staleTime 60 s, sin refetch al enfocar) → `AuthBootstrap`.
+## Fuentes verificadas
 
-- **Redux Toolkit** guarda solamente la autenticación (`features/auth/model/authSlice.ts`: `isAuthenticated`, `user`, `isHydrated`).
-- **React Query** es dueño de todos los datos del servidor (películas, créditos, auditorías, usuarios).
-- **Ningún token en localStorage** — la sesión vive en cookies HttpOnly.
+- [frontend/src/app/admin/audit/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/admin/audit/page.tsx)
+- [frontend/src/app/admin/credits/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/admin/credits/page.tsx)
+- [frontend/src/app/admin/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/admin/page.tsx)
+- [frontend/src/app/admin/users/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/admin/users/page.tsx)
+- [frontend/src/app/credits/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/credits/page.tsx)
+- [frontend/src/app/login/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/login/page.tsx)
+- [frontend/src/app/movie/[id]/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/movie/[id]/page.tsx)
+- [frontend/src/app/my-movies/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/my-movies/page.tsx)
+- [frontend/src/app/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/page.tsx)
+- [frontend/src/app/profile/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/profile/page.tsx)
+- [frontend/src/app/providers/RootProvider.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/providers/RootProvider.tsx)
+- [frontend/src/app/register/page.tsx](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/app/register/page.tsx)
+- [frontend/src/features/admin-audit/api/adminAudit.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/admin-audit/api/adminAudit.api.ts)
+- [frontend/src/features/admin-credits/api/admin-credits.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/admin-credits/api/admin-credits.api.ts)
+- [frontend/src/features/admin-users/api/admin-users.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/admin-users/api/admin-users.api.ts)
+- [frontend/src/features/auth/api/auth.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/auth/api/auth.api.ts)
+- [frontend/src/features/credits/api/credits.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/credits/api/credits.api.ts)
+- [frontend/src/features/movie/api/movie.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/movie/api/movie.api.ts)
+- [frontend/src/features/payment/api/payment.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/payment/api/payment.api.ts)
+- [frontend/src/features/profile/api/profile.api.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/features/profile/api/profile.api.ts)
+- [frontend/src/shared/api/apiClient.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/shared/api/apiClient.ts)
+- [frontend/src/shared/store/store.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/frontend/src/shared/store/store.ts)
 
-## Comunicación con la API
+## Archivos relacionados
 
-`shared/api/apiClient.ts` define una única instancia de axios:
+- [backend/src/application/payment/payment.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/payment/payment.service.ts)
+- [backend/src/application/credit/credit.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/credit/credit.service.ts)
+- [backend/src/presentation/workers/payment-outbox.dispatcher.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment-outbox.dispatcher.ts)
+- [backend/src/presentation/workers/payment.worker.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment.worker.ts)
+- [backend/src/shared/config/platform.config.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/shared/config/platform.config.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-- `baseURL` = `NEXT_PUBLIC_API_URL` (predeterminado `http://localhost:3001`), `timeout` 15 s, `withCredentials: true`
-- Un interceptor de request lee la cookie `cine_csrf_token` (no HttpOnly) y envía el header `x-csrf-token` en `POST/PUT/PATCH/DELETE`
+## Navegación
 
-Cada feature tiene su módulo de API (`features/auth/api/auth.api.ts`, `features/movie/api/movie.api.ts`, `features/payment/api/payment.api.ts`, `features/credits/api/credits.api.ts`, `features/profile/api/profile.api.ts` y los módulos de admin).
-
-## Bootstrap de autenticación
-
-`features/auth/ui/AuthBootstrap.tsx`: al montarse, llama a `GET /auth/me`; si falla intenta `POST /auth/refresh`; si vuelve a fallar, despacha `logout()` y marca la store como hidratada.
-
-## Componentes destacados
-
-- **Reproductor de tráiler** (`entities/movie/ui/MovieTrailer.tsx` + `shared/lib/youtube.ts`): acepta enlaces `youtube.com`, `youtu.be`, `/embed/` y `/shorts/`, construye la URL de embed y muestra una tarjeta de fallback con retry y enlace externo tras 6 s sin cargar.
-- **Popup responsivo** (`shared/ui/feedback/ResponsivePopup.tsx`): variantes `info | success | warning | error`; usado, por ejemplo, en el aviso de créditos insuficientes.
-- Kit compartido: `Button`, `Input`, `Select`, `Checkbox`, `FileInput`, `PaginationControls`.
-
-## Tema
-
-Paleta naranja con variables CSS en `app/globals.css` (`:root` claro / `.dark`), mapeadas en `tailwind.config.ts`. El tema inicial proviene de `NEXT_PUBLIC_START_THEME` vía `shared/config/theme.ts`.
-
-## Idioma
-
-Toda la interfaz está en pt-BR, con textos en archivos de constantes (p. ej.: `features/credits/model/credits.constants.ts`, `entities/credit/model/credit-labels.pt-br.ts`). No hay biblioteca de i18n.
-
-> Versión: 1.0.0
+- [Project guide](?menu=es&lang=es&id=9)
+- [Source reference](?menu=es&lang=es&id=10)

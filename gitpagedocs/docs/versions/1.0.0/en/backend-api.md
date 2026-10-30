@@ -1,104 +1,78 @@
 # Backend and API
 
-NestJS 11 API with Prisma 6 on PostgreSQL, RabbitMQ messaging, and Clean Architecture-inspired layers (`domain` → `application` → `infrastructure` / `presentation`).
+Movie catalog with authentication, profiles, administration, movie purchases, a credit wallet and referrals. Movie checkout charges its monetary price; it does not debit the wallet. Credits have their own checkout and consumption. Distinguish mock and Stripe modes when interpreting approved purchases.
 
-## Bootstrap
+## Workflow and failure cases
 
-`backend/src/main.ts` initializes with `rawBody: true` (required for the Stripe signature), the pino logger, configuration validation (`validatePlatformConfig()`), `cookie-parser`, helmet with environment-driven CSP, CORS with credentials, a global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`), and static assets at `/uploads/`. When `PAYMENT_FLOW_MODE=rmq`, it also connects a RabbitMQ microservice (durable queue, DLX to the DLQ, `noAck: false`, configurable prefetch).
+1. Registration/login validates local credentials or a Firebase token and creates a session. Access/refresh cookies are HttpOnly; the CSRF cookie is readable by the client and accompanies x-csrf-token when enabled. Refresh, logout, password/profile changes and avatars have dedicated endpoints. Movie list/detail feed browsing and checkout.
 
-Global guards: `ThrottlerGuard` (rate limiting) and `RolesGuard` (RBAC via `@Roles` metadata).
+2. POST /payments/checkout receives movieId and creates correlationId. In rmq mode the repository creates a PENDING Purchase and outbox; the Prisma adapter writes both transactionally. A dispatcher publishes checkout.requested; a worker invokes the gateway, updates COMPLETED/FAILED and records audit events. Timeout, attempts and DLQ are configurable. In sync mode the gateway runs within the request.
 
-## Endpoints
+3. The /payments/webhook/stripe webhook validates the signature using the raw body and STRIPE_WEBHOOK_SECRET. Previously processed events are recognized; payment_intent.succeeded/failed update purchases. purchaseKind routes credit purchases. correlationId provides gateway idempotency; processed events and the ledger add checks. Inspect each adapter before assuming Prisma-equivalent atomicity elsewhere.
 
-### Authentication — `/auth`
+4. Credit plans → /credits/checkout → dedicated outbox/worker → approval → ledger and balance. /credits/consume debits and rejects insufficient funds. Registration can award base/referral bonuses. A referred user's first approved credit purchase can reward the referrer; configuration, correlations and reward logs prevent repeated benefits in the intended flow. Admins manage users, plans/settings and audit.
 
-| Method | Route | Guard | Description |
-|---|---|---|---|
-| POST | `/auth/register` | — | Registration (with optional referral code); sets 3 cookies |
-| POST | `/auth/login` | — | Local login or with `firebaseIdToken` |
-| POST | `/auth/refresh` | — | Renews the session (manual CSRF check) |
-| GET | `/auth/me` | JWT | Current user |
-| POST | `/auth/logout` | JWT | Clears cookies |
-| PUT | `/auth/profile` | JWT | Updates name/e-mail |
-| PUT | `/auth/password` | JWT | Password change (strong policy + bcrypt) |
-| POST | `/auth/avatar/upload` | JWT | Avatar upload (multipart) |
+| Method and path | Declaration |
+| --- | --- |
+| `DELETE /admin/credits/plans/:id` | [backend/src/presentation/controllers/admin-credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-credit.controller.ts) |
+| `DELETE /admin/users/:id` | [backend/src/presentation/controllers/admin-user.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-user.controller.ts) |
+| `DELETE /movies/:id` | [backend/src/presentation/controllers/movie.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/movie.controller.ts) |
+| `GET /admin/credits/config` | [backend/src/presentation/controllers/admin-credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-credit.controller.ts) |
+| `GET /admin/credits/plans` | [backend/src/presentation/controllers/admin-credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-credit.controller.ts) |
+| `GET /admin/users` | [backend/src/presentation/controllers/admin-user.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-user.controller.ts) |
+| `GET /auth/me` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `GET /credits/balance` | [backend/src/presentation/controllers/credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/credit.controller.ts) |
+| `GET /credits/history` | [backend/src/presentation/controllers/credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/credit.controller.ts) |
+| `GET /credits/plans` | [backend/src/presentation/controllers/credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/credit.controller.ts) |
+| `GET /credits/purchases` | [backend/src/presentation/controllers/credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/credit.controller.ts) |
+| `GET /health` | [backend/src/presentation/controllers/health.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/health.controller.ts) |
+| `GET /movies/:id` | [backend/src/presentation/controllers/movie.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/movie.controller.ts) |
+| `GET /movies` | [backend/src/presentation/controllers/movie.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/movie.controller.ts) |
+| `GET /payments/admin/audits` | [backend/src/presentation/controllers/payment-audit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/payment-audit.controller.ts) |
+| `GET /payments/my-movies` | [backend/src/presentation/controllers/payment.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/payment.controller.ts) |
+| `PATCH /admin/credits/config` | [backend/src/presentation/controllers/admin-credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-credit.controller.ts) |
+| `PATCH /admin/credits/plans/:id` | [backend/src/presentation/controllers/admin-credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-credit.controller.ts) |
+| `PATCH /admin/users/:id/role` | [backend/src/presentation/controllers/admin-user.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-user.controller.ts) |
+| `PATCH /admin/users/:id` | [backend/src/presentation/controllers/admin-user.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-user.controller.ts) |
+| `POST /admin/credits/plans` | [backend/src/presentation/controllers/admin-credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-credit.controller.ts) |
+| `POST /admin/users` | [backend/src/presentation/controllers/admin-user.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/admin-user.controller.ts) |
+| `POST /auth/avatar/upload` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `POST /auth/login` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `POST /auth/logout` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `POST /auth/refresh` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `POST /auth/register` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `POST /credits/checkout` | [backend/src/presentation/controllers/credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/credit.controller.ts) |
+| `POST /credits/consume` | [backend/src/presentation/controllers/credit.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/credit.controller.ts) |
+| `POST /movies/upload` | [backend/src/presentation/controllers/movie.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/movie.controller.ts) |
+| `POST /movies` | [backend/src/presentation/controllers/movie.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/movie.controller.ts) |
+| `POST /payments/checkout` | [backend/src/presentation/controllers/payment.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/payment.controller.ts) |
+| `POST /payments/webhook/stripe` | [backend/src/presentation/controllers/stripe-webhook.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/stripe-webhook.controller.ts) |
+| `PUT /auth/password` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `PUT /auth/profile` | [backend/src/presentation/controllers/auth.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/auth.controller.ts) |
+| `PUT /movies/:id` | [backend/src/presentation/controllers/movie.controller.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/controllers/movie.controller.ts) |
 
-### Movies — `/movies`
+## Request example
 
-| Method | Route | Guard |
-|---|---|---|
-| GET | `/movies` | Public (paginated) |
-| GET | `/movies/:id` | Public |
-| POST | `/movies` | JWT + ADMIN |
-| POST | `/movies/upload` | JWT + ADMIN (poster) |
-| PUT | `/movies/:id` | JWT + ADMIN |
-| DELETE | `/movies/:id` | JWT + ADMIN |
+```http
+POST /payments/checkout HTTP/1.1
+Cookie: <authenticated-session-cookies>
+x-csrf-token: <csrf-token>
+Content-Type: application/json
 
-### Payments — `/payments`
+{"movieId":"<existing-movie-id>"}
+```
 
-| Method | Route | Guard | Description |
-|---|---|---|---|
-| POST | `/payments/checkout` | JWT | Starts a movie purchase (`{movieId}`) |
-| GET | `/payments/my-movies` | JWT | Paginated COMPLETED purchases |
-| GET | `/payments/admin/audits` | JWT + ADMIN | Audit trail |
-| POST | `/payments/webhook/stripe` | Stripe signature | Webhook (no guard; validates `stripe-signature`) |
+## Related files
 
-### Credits — `/credits` and `/admin/credits`
+- [backend/src/application/payment/payment.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/payment/payment.service.ts)
+- [backend/src/application/credit/credit.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/credit/credit.service.ts)
+- [backend/src/presentation/workers/payment-outbox.dispatcher.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment-outbox.dispatcher.ts)
+- [backend/src/presentation/workers/payment.worker.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment.worker.ts)
+- [backend/src/shared/config/platform.config.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/shared/config/platform.config.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-| Method | Route | Guard | Description |
-|---|---|---|---|
-| GET | `/credits/balance` | JWT | Current balance |
-| GET | `/credits/plans` | JWT | Active plans |
-| GET | `/credits/history` | JWT | Transaction history (ledger) |
-| GET | `/credits/purchases` | JWT | Credit purchases |
-| POST | `/credits/checkout` | JWT | Plan purchase (`{creditPlanId}`) |
-| POST | `/credits/consume` | JWT | Consumption (`{amount, description, correlationId?}`) |
-| GET/POST | `/admin/credits/plans` | JWT + ADMIN | List/create plans |
-| PATCH/DELETE | `/admin/credits/plans/:id` | JWT + ADMIN | Edit/remove plan |
-| GET/PATCH | `/admin/credits/config` | JWT + ADMIN | Global configuration |
+## Navigation
 
-### Users (admin) — `/admin/users`
-
-Full CRUD: `GET`, `POST`, `PATCH /:id`, `PATCH /:id/role`, `DELETE /:id`. Safety rules: an admin cannot delete themselves, cannot change their own role, and cannot demote/delete the last ADMIN.
-
-### Health
-
-`GET /health` → `{status: "ok"}`.
-
-## Authentication and session
-
-Three modes via `AUTH_MODE`: `local`, `firebase`, and `hybrid` (the presence of `firebaseIdToken` selects the Firebase path). The session lives in 3 cookies:
-
-- `cine_access_token` — signed JWT (`JWT_SECRET`, default expiration 1d), HttpOnly
-- `cine_refresh_token` — JWE (`jose`, A256GCM, key = SHA-256 of `AUTH_JWE_SECRET`, default 7d), HttpOnly
-- `cine_csrf_token` — random token, readable by JS (double-submit pattern)
-
-The `JwtAuthGuard` reads the cookie first and falls back to `Authorization: Bearer`; when the token came from a cookie and the method is a mutation, it requires `x-csrf-token` to match the cookie. Role escalation is blocked: requesting `ADMIN` at registration only works if the e-mail matches `ADMIN_EMAIL`.
-
-Password policy: 8–64 characters with a lowercase letter, an uppercase letter, a digit, and a symbol; bcrypt hash (cost 10).
-
-## Data model (Prisma)
-
-Main models in `backend/prisma/schema.prisma`:
-
-- **User** — credentials, role, `creditsBalance`, unique `referralCode`, referral self-relation, bonus flags
-- **Movie** — title, synopsis, genre, `price Decimal(10,2)`, poster, and trailer
-- **Purchase** — movie purchase with `status` (PENDING/COMPLETED/FAILED), `provider`, unique `correlationId`, and the Stripe intent
-- **PaymentAudit** — immutable trail with a denormalized snapshot (name, e-mail, title)
-- **PaymentOutbox** / **CreditPurchaseOutbox** — outbox pattern with `attempts`, `nextAttemptAt`, and status
-- **CreditPlan**, **CreditPurchase**, **CreditTransaction** (ledger with `balanceBefore`/`balanceAfter` and unique `(userId, correlationId)`), **CreditSystemConfig** (singleton id=1), **ReferralRewardLog**
-- **ProcessedWebhookEvent** — durable webhook idempotency
-
-Every repository has both a Prisma and a Firebase implementation; the choice is made at injection time by `repository-provider.factory.ts` reading `DATABASE_PROVIDER`.
-
-## Security
-
-- Helmet with configurable CSP, `frameAncestors 'none'`, HSTS 180 days
-- CORS with credentials restricted to an explicit origin list
-- Global `ValidationPipe` rejects unknown fields; `ParseUUIDPipe` on all `:id` routes
-- Double-submit CSRF on cookie-authenticated mutations
-- Global rate limiting (`RATE_LIMIT_*`)
-- Hardened uploads: MIME allowlist + extension↔MIME cross-check, size limit, and random filenames
-- Pino logs with correlation via `x-request-id`
-
-> Version: 1.0.0
+- [Project guide](?menu=en&lang=en&id=9)
+- [Source reference](?menu=en&lang=en&id=10)

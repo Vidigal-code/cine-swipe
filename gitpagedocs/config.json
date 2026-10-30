@@ -2,131 +2,357 @@
   "site": {
     "name": "CineSwipe",
     "defaultLanguage": "pt",
-    "supportedLanguages": [
-      "en",
-      "pt",
-      "es"
-    ],
+    "languages": {
+      "en": true,
+      "pt": true,
+      "es": true
+    },
     "HideThemeSelector": true,
     "ThemeDefault": "duet-dark",
     "ThemeModeDefault": "dark",
+    "backToTop": {
+      "enabled": true,
+      "minPageHeightViewports": 3
+    },
+    "documentNavigation": {
+      "position": "center"
+    },
+    "containerPagination": {
+      "enabled": true,
+      "alignment": "right",
+      "placement": "bottom",
+      "display": "icon",
+      "showCount": true,
+      "controls": {
+        "first": true,
+        "previous": true,
+        "next": true,
+        "last": true
+      },
+      "icons": {
+        "first": "FiSkipBack",
+        "previous": "FiChevronLeft",
+        "next": "FiChevronRight",
+        "last": "FiSkipForward"
+      },
+      "iconSize": "20px",
+      "labels": {
+        "pages": {
+          "en": "Pages",
+          "pt": "Páginas",
+          "es": "Páginas"
+        },
+        "first": {
+          "en": "First page",
+          "pt": "Primeira página",
+          "es": "Primera página"
+        },
+        "previous": {
+          "en": "Previous page",
+          "pt": "Página anterior",
+          "es": "Página anterior"
+        },
+        "next": {
+          "en": "Next page",
+          "pt": "Próxima página",
+          "es": "Página siguiente"
+        },
+        "last": {
+          "en": "Last page",
+          "pt": "Última página",
+          "es": "Última página"
+        }
+      }
+    },
+    "markdownMarkers": {
+      "enabled": true,
+      "style": {
+        "background": "color-mix(in srgb, var(--primary) 24%, transparent)",
+        "color": "var(--text)",
+        "outlineColor": "var(--primary)"
+      }
+    },
+    "backgroundEffects": {
+      "enabled": true,
+      "overrides": {
+        "accessibility": {
+          "showPauseButton": true
+        }
+      },
+      "themes": {}
+    },
+    "icons": {
+      "defaults": {
+        "reactIcon": true,
+        "colorDark": "White",
+        "colorLight": "black",
+        "size": "25px",
+        "imgDark": "",
+        "imgLight": "",
+        "imgWidth": 20,
+        "imgHeight": 20
+      },
+      "BackgroundAnimationPause": {
+        "tag": "FiPause",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "BackgroundAnimationResume": {
+        "tag": "FiPlay",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "QuickNavigation": {
+        "tag": "LuSearch",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "LanguageSelector": {
+        "tag": "SiGoogletranslate",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "ThemeSelector": {
+        "tag": "LuPencil",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "VersionSelector": {
+        "tag": "LuGitBranch",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "FocusMode": {
+        "tag": "LuBookOpen",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "PdfDownload": {
+        "tag": "LuDownload",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "PdfOpenInNewTab": {
+        "tag": "LuExternalLink",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "DocumentPrevious": {
+        "tag": "LuChevronLeft",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "DocumentNext": {
+        "tag": "LuChevronRight",
+        "colorDark": "currentColor",
+        "colorLight": "currentColor",
+        "size": "22px",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "ImageMenuHeader": {
+        "tag": "FaGithubAlt"
+      },
+      "ProjectLink": {
+        "tag": "FaGithubAlt",
+        "size": null
+      },
+      "VersionLinks": {
+        "tag": "FaCodeBranch"
+      },
+      "InfoHeaderMenu": {
+        "tag": "BsInfoSquareFill"
+      },
+      "PreviewProjectLink": {
+        "tag": "CiGlobe"
+      },
+      "NavMenuOpen": {
+        "tag": "FaBars"
+      },
+      "NavMenuClose": {
+        "tag": "IoMdClose"
+      },
+      "NavMenuMobileOpen": {
+        "tag": "FaBars"
+      },
+      "NavMenuMobileClose": {
+        "tag": "IoMdClose"
+      },
+      "NavMenuBlockActive": {
+        "tag": "FiLock"
+      },
+      "NavMenuBlockInactive": {
+        "tag": "FiUnlock"
+      },
+      "DocsLock": {
+        "tag": "FiLock",
+        "size": "22px"
+      },
+      "AudioPlay": {
+        "tag": "CiPlay1",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "AudioPause": {
+        "tag": "FaPause",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "AudioPlayerPopoverClose": {
+        "tag": "IoMdClose"
+      },
+      "AudioPlayerPopoverPlay": {
+        "tag": "CiPlay1"
+      },
+      "AudioPlayerPopoverPause": {
+        "tag": "FaPause"
+      },
+      "AudioPlayerPopoverRestart": {
+        "tag": "FiRefreshCw"
+      },
+      "AudioPlayerPopoverLoopOn": {
+        "tag": "FiRepeat"
+      },
+      "AudioPlayerPopoverLoopOff": {
+        "tag": "FiRepeat"
+      },
+      "AiChatOpen": {
+        "tag": "BsChatDots",
+        "size": "22px"
+      },
+      "AiChatClose": {
+        "tag": "IoMdClose",
+        "size": "22px"
+      },
+      "AiChatSettings": {
+        "tag": "FiSettings",
+        "size": "20px"
+      },
+      "AiChatSend": {
+        "tag": "FiSend",
+        "size": "20px"
+      },
+      "AiChatCancel": {
+        "tag": "FiXCircle",
+        "size": "20px"
+      },
+      "AiChatTrash": {
+        "tag": "FiTrash2",
+        "size": "20px"
+      },
+      "AiChatClearChat": {
+        "tag": "FiMessageSquare",
+        "size": "20px"
+      },
+      "AiChatClearData": {
+        "tag": "FiDatabase",
+        "size": "20px"
+      },
+      "AiChatExpand": {
+        "tag": "FiMaximize2",
+        "size": "20px"
+      },
+      "AiChatCollapse": {
+        "tag": "FiMinimize2",
+        "size": "20px"
+      },
+      "SidebarCollapse": {
+        "tag": "FiChevronsLeft",
+        "size": "22px"
+      },
+      "SidebarExpand": {
+        "tag": "FiChevronsRight",
+        "size": "22px"
+      }
+    },
     "ActiveNavigation": true,
     "FocusMode": true,
+    "focusMode": {
+      "copyEnabled": true,
+      "downloadEnabled": true,
+      "sectionNavigationEnabled": true,
+      "documentNavigationEnabled": true
+    },
+    "nestedMenusEnabled": true,
+    "pdf": {
+      "enabled": true,
+      "previewEnabled": true,
+      "downloadEnabled": true,
+      "openInNewTabEnabled": true
+    },
+    "RouteGuide": true,
+    "accessibility": {
+      "enabled": true,
+      "narration": {
+        "enabled": true,
+        "defaultRate": 1,
+        "defaultVolume": 1
+      }
+    },
     "FooterEnabled": true,
     "FooterLinkName": "CineSwipe",
-    "FooterLinkUrl": "https://github.com/vidigal-code/cine-swipe",
+    "FooterLinkUrl": "https://github.com/Vidigal-code/cine-swipe",
     "FooterDateMode": "browser",
     "FooterDateCustom": "",
-    "ProjectLink": "https://github.com/vidigal-code/cine-swipe",
+    "ProjectLink": "https://github.com/Vidigal-code/cine-swipe",
     "SiteIconPath": "/icon.svg",
     "SiteHeaderName": "CineSwipe",
-    "IconImageMenuHeaderImgWidth": 20,
-    "IconImageMenuHeaderImgHeight": 20,
-    "IconImageMenuHeaderLightImg": "",
-    "IconImageMenuHeaderDarkImg": "",
-    "IconImageMenuHeaderReactIcones": true,
-    "IconImageMenuHeaderReactIconesTag": "FaGithubAlt",
-    "IconImageMenuHeaderReactIconesTagColorDark": "White",
-    "IconImageMenuHeaderReactIconesTagColorLight": "black",
-    "IconImageMenuHeaderReactIconesTagSize": "25px",
-    "IconProjectLinkLightImg": "",
-    "IconProjectLinkDarkImg": "",
-    "IconProjectLinkReactIcones": true,
-    "IconProjectLinkReactIconesTag": "FaGithubAlt",
-    "IconProjectLinkReactIconesTagColorDark": "White",
-    "IconProjectLinkReactIconesTagColorLight": "black",
-    "IconProjectLinkImgWidth": 20,
-    "IconProjectLinkImgHeight": 20,
-    "IconVersionLinksLightImg": "",
-    "IconVersionLinksDarkImg": "",
-    "IconVersionLinksReactIcones": true,
-    "IconVersionLinksReactIconesTag": "FaCodeBranch",
-    "IconVersionLinksReactIconesTagColorDark": "White",
-    "IconVersionLinksReactIconesTagColorLight": "black",
-    "IconVersionLinksReactIconesTagSize": "25px",
-    "IconVersionLinksImgWidth": 20,
-    "IconVersionLinksImgHeight": 20,
-    "IconInfoHeaderMenuLightImg": "",
-    "IconInfoHeaderMenuDarkImg": "",
-    "IconInfoHeaderMenuReactIcones": true,
-    "IconInfoHeaderMenuReactIconesTag": "BsInfoSquareFill",
-    "IconInfoHeaderMenuReactIconesTagColorDark": "White",
-    "IconInfoHeaderMenuReactIconesTagColorLight": "black",
-    "IconInfoHeaderMenuReactIconesTagSize": "25px",
-    "IconInfoHeaderMenuImgWidth": 20,
-    "IconInfoHeaderMenuImgHeight": 20,
-    "IconPreviewProjectLinkLightImg": "",
-    "IconPreviewProjectLinkDarkImg": "",
-    "IconPreviewProjectLinkReactIcones": true,
-    "IconPreviewProjectLinkReactIconesTag": "CiGlobe",
-    "IconPreviewProjectLinkReactIconesTagColorDark": "White",
-    "IconPreviewProjectLinkReactIconesTagColorLight": "black",
-    "IconPreviewProjectLinkReactIconesTagSize": "25px",
-    "IconPreviewProjectLinkImgWidth": 20,
-    "IconPreviewProjectLinkImgHeight": 20,
-    "IconNavMenuOpenLightImg": "",
-    "IconNavMenuOpenDarkImg": "",
-    "IconNavMenuOpenReactIcones": true,
-    "IconNavMenuOpenReactIconesTag": "FaBars",
-    "IconNavMenuOpenReactIconesTagColorDark": "White",
-    "IconNavMenuOpenReactIconesTagColorLight": "black",
-    "IconNavMenuOpenReactIconesTagSize": "25px",
-    "IconNavMenuOpenImgWidth": 20,
-    "IconNavMenuOpenImgHeight": 20,
-    "IconNavMenuCloseLightImg": "",
-    "IconNavMenuCloseDarkImg": "",
-    "IconNavMenuCloseReactIcones": true,
-    "IconNavMenuCloseReactIconesTag": "IoMdClose",
-    "IconNavMenuCloseReactIconesTagColorDark": "White",
-    "IconNavMenuCloseReactIconesTagColorLight": "black",
-    "IconNavMenuCloseReactIconesTagSize": "25px",
-    "IconNavMenuCloseImgWidth": 20,
-    "IconNavMenuCloseImgHeight": 20,
-    "IconNavMenuMobileOpenLightImg": "",
-    "IconNavMenuMobileOpenDarkImg": "",
-    "IconNavMenuMobileOpenReactIcones": true,
-    "IconNavMenuMobileOpenReactIconesTag": "FaBars",
-    "IconNavMenuMobileOpenReactIconesTagColorDark": "White",
-    "IconNavMenuMobileOpenReactIconesTagColorLight": "black",
-    "IconNavMenuMobileOpenReactIconesTagSize": "25px",
-    "IconNavMenuMobileOpenImgWidth": 20,
-    "IconNavMenuMobileOpenImgHeight": 20,
-    "IconNavMenuMobileCloseLightImg": "",
-    "IconNavMenuMobileCloseDarkImg": "",
-    "IconNavMenuMobileCloseReactIcones": true,
-    "IconNavMenuMobileCloseReactIconesTag": "IoMdClose",
-    "IconNavMenuMobileCloseReactIconesTagColorDark": "White",
-    "IconNavMenuMobileCloseReactIconesTagColorLight": "black",
-    "IconNavMenuMobileCloseReactIconesTagSize": "25px",
-    "IconNavMenuMobileCloseImgWidth": 20,
-    "IconNavMenuMobileCloseImgHeight": 20,
-    "IconNavMenuBlockActiveLightImg": "",
-    "IconNavMenuBlockActiveDarkImg": "",
-    "IconNavMenuBlockActiveReactIcones": true,
-    "IconNavMenuBlockActiveReactIconesTag": "FiLock",
-    "IconNavMenuBlockActiveReactIconesTagColorDark": "White",
-    "IconNavMenuBlockActiveReactIconesTagColorLight": "black",
-    "IconNavMenuBlockActiveReactIconesTagSize": "25px",
-    "IconNavMenuBlockActiveImgWidth": 20,
-    "IconNavMenuBlockActiveImgHeight": 20,
-    "IconNavMenuBlockInactiveLightImg": "",
-    "IconNavMenuBlockInactiveDarkImg": "",
-    "IconNavMenuBlockInactiveReactIcones": true,
-    "IconNavMenuBlockInactiveReactIconesTag": "FiUnlock",
-    "IconNavMenuBlockInactiveReactIconesTagColorDark": "White",
-    "IconNavMenuBlockInactiveReactIconesTagColorLight": "black",
-    "IconNavMenuBlockInactiveReactIconesTagSize": "25px",
-    "IconNavMenuBlockInactiveImgWidth": 20,
-    "IconNavMenuBlockInactiveImgHeight": 20,
-    "IconDocsLockLightImg": "",
-    "IconDocsLockDarkImg": "",
-    "IconDocsLockReactIcones": true,
-    "IconDocsLockReactIconesTag": "FiLock",
-    "IconDocsLockReactIconesTagColorDark": "White",
-    "IconDocsLockReactIconesTagColorLight": "black",
-    "IconDocsLockReactIconesTagSize": "22px",
-    "IconDocsLockImgWidth": 20,
-    "IconDocsLockImgHeight": 20,
     "RouteguideBrandPositionDefault": "center",
     "RouteguideBrandContainerTopDefault": false,
     "audioPlayerEnabled": false,
@@ -135,184 +361,16 @@
     "audioSequentialPlayback": false,
     "audioPopoverHideSource": false,
     "audioPopoverShowMinutes": true,
+    "mediaExclusivePlayback": true,
+    "AiChatAutoLockSeconds": 30,
     "audioTracks": [],
-    "IconAudioPlayReactIcones": true,
-    "IconAudioPlayReactIconesTag": "CiPlay1",
-    "IconAudioPlayReactIconesTagColorDark": "White",
-    "IconAudioPlayReactIconesTagColorLight": "black",
-    "IconAudioPlayReactIconesTagSize": "25px",
-    "IconAudioPauseReactIcones": true,
-    "IconAudioPauseReactIconesTag": "FaPause",
-    "IconAudioPauseReactIconesTagColorDark": "White",
-    "IconAudioPauseReactIconesTagColorLight": "black",
-    "IconAudioPauseReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverCloseLightImg": "",
-    "IconAudioPlayerPopoverCloseDarkImg": "",
-    "IconAudioPlayerPopoverCloseReactIcones": true,
-    "IconAudioPlayerPopoverCloseReactIconesTag": "IoMdClose",
-    "IconAudioPlayerPopoverCloseReactIconesTagColorDark": "White",
-    "IconAudioPlayerPopoverCloseReactIconesTagColorLight": "black",
-    "IconAudioPlayerPopoverCloseReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverCloseImgWidth": 20,
-    "IconAudioPlayerPopoverCloseImgHeight": 20,
-    "IconAudioPlayerPopoverPlayLightImg": "",
-    "IconAudioPlayerPopoverPlayDarkImg": "",
-    "IconAudioPlayerPopoverPlayReactIcones": true,
-    "IconAudioPlayerPopoverPlayReactIconesTag": "CiPlay1",
-    "IconAudioPlayerPopoverPlayReactIconesTagColorDark": "White",
-    "IconAudioPlayerPopoverPlayReactIconesTagColorLight": "black",
-    "IconAudioPlayerPopoverPlayReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverPlayImgWidth": 20,
-    "IconAudioPlayerPopoverPlayImgHeight": 20,
-    "IconAudioPlayerPopoverPauseLightImg": "",
-    "IconAudioPlayerPopoverPauseDarkImg": "",
-    "IconAudioPlayerPopoverPauseReactIcones": true,
-    "IconAudioPlayerPopoverPauseReactIconesTag": "FaPause",
-    "IconAudioPlayerPopoverPauseReactIconesTagColorDark": "White",
-    "IconAudioPlayerPopoverPauseReactIconesTagColorLight": "black",
-    "IconAudioPlayerPopoverPauseReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverPauseImgWidth": 20,
-    "IconAudioPlayerPopoverPauseImgHeight": 20,
-    "IconAudioPlayerPopoverRestartLightImg": "",
-    "IconAudioPlayerPopoverRestartDarkImg": "",
-    "IconAudioPlayerPopoverRestartReactIcones": true,
-    "IconAudioPlayerPopoverRestartReactIconesTag": "FiRefreshCw",
-    "IconAudioPlayerPopoverRestartReactIconesTagColorDark": "White",
-    "IconAudioPlayerPopoverRestartReactIconesTagColorLight": "black",
-    "IconAudioPlayerPopoverRestartReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverRestartImgWidth": 20,
-    "IconAudioPlayerPopoverRestartImgHeight": 20,
-    "IconAudioPlayerPopoverLoopOnLightImg": "",
-    "IconAudioPlayerPopoverLoopOnDarkImg": "",
-    "IconAudioPlayerPopoverLoopOnReactIcones": true,
-    "IconAudioPlayerPopoverLoopOnReactIconesTag": "FiRepeat",
-    "IconAudioPlayerPopoverLoopOnReactIconesTagColorDark": "White",
-    "IconAudioPlayerPopoverLoopOnReactIconesTagColorLight": "black",
-    "IconAudioPlayerPopoverLoopOnReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverLoopOnImgWidth": 20,
-    "IconAudioPlayerPopoverLoopOnImgHeight": 20,
-    "IconAudioPlayerPopoverLoopOffLightImg": "",
-    "IconAudioPlayerPopoverLoopOffDarkImg": "",
-    "IconAudioPlayerPopoverLoopOffReactIcones": true,
-    "IconAudioPlayerPopoverLoopOffReactIconesTag": "FiRepeat",
-    "IconAudioPlayerPopoverLoopOffReactIconesTagColorDark": "White",
-    "IconAudioPlayerPopoverLoopOffReactIconesTagColorLight": "black",
-    "IconAudioPlayerPopoverLoopOffReactIconesTagSize": "25px",
-    "IconAudioPlayerPopoverLoopOffImgWidth": 20,
-    "IconAudioPlayerPopoverLoopOffImgHeight": 20,
-    "IconAiChatOpenLightImg": "",
-    "IconAiChatOpenDarkImg": "",
-    "IconAiChatOpenReactIcones": true,
-    "IconAiChatOpenReactIconesTag": "BsChatDots",
-    "IconAiChatOpenReactIconesTagColorDark": "White",
-    "IconAiChatOpenReactIconesTagColorLight": "black",
-    "IconAiChatOpenReactIconesTagSize": "22px",
-    "IconAiChatOpenImgWidth": 20,
-    "IconAiChatOpenImgHeight": 20,
-    "IconAiChatCloseLightImg": "",
-    "IconAiChatCloseDarkImg": "",
-    "IconAiChatCloseReactIcones": true,
-    "IconAiChatCloseReactIconesTag": "IoMdClose",
-    "IconAiChatCloseReactIconesTagColorDark": "White",
-    "IconAiChatCloseReactIconesTagColorLight": "black",
-    "IconAiChatCloseReactIconesTagSize": "22px",
-    "IconAiChatCloseImgWidth": 20,
-    "IconAiChatCloseImgHeight": 20,
-    "IconAiChatSettingsLightImg": "",
-    "IconAiChatSettingsDarkImg": "",
-    "IconAiChatSettingsReactIcones": true,
-    "IconAiChatSettingsReactIconesTag": "FiSettings",
-    "IconAiChatSettingsReactIconesTagColorDark": "White",
-    "IconAiChatSettingsReactIconesTagColorLight": "black",
-    "IconAiChatSettingsReactIconesTagSize": "20px",
-    "IconAiChatSettingsImgWidth": 20,
-    "IconAiChatSettingsImgHeight": 20,
-    "IconAiChatSendLightImg": "",
-    "IconAiChatSendDarkImg": "",
-    "IconAiChatSendReactIcones": true,
-    "IconAiChatSendReactIconesTag": "FiSend",
-    "IconAiChatSendReactIconesTagColorDark": "White",
-    "IconAiChatSendReactIconesTagColorLight": "black",
-    "IconAiChatSendReactIconesTagSize": "20px",
-    "IconAiChatSendImgWidth": 20,
-    "IconAiChatSendImgHeight": 20,
-    "IconAiChatCancelLightImg": "",
-    "IconAiChatCancelDarkImg": "",
-    "IconAiChatCancelReactIcones": true,
-    "IconAiChatCancelReactIconesTag": "FiXCircle",
-    "IconAiChatCancelReactIconesTagColorDark": "White",
-    "IconAiChatCancelReactIconesTagColorLight": "black",
-    "IconAiChatCancelReactIconesTagSize": "20px",
-    "IconAiChatCancelImgWidth": 20,
-    "IconAiChatCancelImgHeight": 20,
-    "IconAiChatTrashLightImg": "",
-    "IconAiChatTrashDarkImg": "",
-    "IconAiChatTrashReactIcones": true,
-    "IconAiChatTrashReactIconesTag": "FiTrash2",
-    "IconAiChatTrashReactIconesTagColorDark": "White",
-    "IconAiChatTrashReactIconesTagColorLight": "black",
-    "IconAiChatTrashReactIconesTagSize": "20px",
-    "IconAiChatTrashImgWidth": 20,
-    "IconAiChatTrashImgHeight": 20,
-    "IconAiChatClearChatLightImg": "",
-    "IconAiChatClearChatDarkImg": "",
-    "IconAiChatClearChatReactIcones": true,
-    "IconAiChatClearChatReactIconesTag": "FiMessageSquare",
-    "IconAiChatClearChatReactIconesTagColorDark": "White",
-    "IconAiChatClearChatReactIconesTagColorLight": "black",
-    "IconAiChatClearChatReactIconesTagSize": "20px",
-    "IconAiChatClearChatImgWidth": 20,
-    "IconAiChatClearChatImgHeight": 20,
-    "IconAiChatClearDataLightImg": "",
-    "IconAiChatClearDataDarkImg": "",
-    "IconAiChatClearDataReactIcones": true,
-    "IconAiChatClearDataReactIconesTag": "FiDatabase",
-    "IconAiChatClearDataReactIconesTagColorDark": "White",
-    "IconAiChatClearDataReactIconesTagColorLight": "black",
-    "IconAiChatClearDataReactIconesTagSize": "20px",
-    "IconAiChatClearDataImgWidth": 20,
-    "IconAiChatClearDataImgHeight": 20,
-    "IconAiChatExpandLightImg": "",
-    "IconAiChatExpandDarkImg": "",
-    "IconAiChatExpandReactIcones": true,
-    "IconAiChatExpandReactIconesTag": "FiMaximize2",
-    "IconAiChatExpandReactIconesTagColorDark": "White",
-    "IconAiChatExpandReactIconesTagColorLight": "black",
-    "IconAiChatExpandReactIconesTagSize": "20px",
-    "IconAiChatExpandImgWidth": 20,
-    "IconAiChatExpandImgHeight": 20,
-    "IconAiChatCollapseLightImg": "",
-    "IconAiChatCollapseDarkImg": "",
-    "IconAiChatCollapseReactIcones": true,
-    "IconAiChatCollapseReactIconesTag": "FiMinimize2",
-    "IconAiChatCollapseReactIconesTagColorDark": "White",
-    "IconAiChatCollapseReactIconesTagColorLight": "black",
-    "IconAiChatCollapseReactIconesTagSize": "20px",
-    "IconAiChatCollapseImgWidth": 20,
-    "IconAiChatCollapseImgHeight": 20,
-    "IconSidebarCollapseLightImg": "",
-    "IconSidebarCollapseDarkImg": "",
-    "IconSidebarCollapseReactIcones": true,
-    "IconSidebarCollapseReactIconesTag": "FiChevronsLeft",
-    "IconSidebarCollapseReactIconesTagColorDark": "White",
-    "IconSidebarCollapseReactIconesTagColorLight": "black",
-    "IconSidebarCollapseReactIconesTagSize": "22px",
-    "IconSidebarCollapseImgWidth": 20,
-    "IconSidebarCollapseImgHeight": 20,
-    "IconSidebarExpandLightImg": "",
-    "IconSidebarExpandDarkImg": "",
-    "IconSidebarExpandReactIcones": true,
-    "IconSidebarExpandReactIconesTag": "FiChevronsRight",
-    "IconSidebarExpandReactIconesTagColorDark": "White",
-    "IconSidebarExpandReactIconesTagColorLight": "black",
-    "IconSidebarExpandReactIconesTagSize": "22px",
-    "IconSidebarExpandImgWidth": 20,
-    "IconSidebarExpandImgHeight": 20,
     "TocScrollMaxHeightDesktop": "min(65vh, 400px)",
     "TocScrollMaxHeightMobile": "min(45vh, 280px)",
     "layoutsConfigPathOficial": true,
-    "layoutsConfigPathTemplatesOficial": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagelayouts/templates",
-    "layoutsConfigPathOficialUrl": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagelayouts/layoutsConfig.json",
+    "layoutsConfigPathTemplatesOficial": "https://github.com/Vidigal-code/git-page-docs/blob/v0.0.17/gitpagelayouts/templates",
+    "layoutsConfigPathOficialUrl": "https://github.com/Vidigal-code/git-page-docs/blob/v0.0.17/gitpagelayouts/layoutsConfig.json",
+    "layoutsConfigPath": "",
+    "layoutsConfigPathTemplates": "",
     "repositorySearchHome": true,
     "rendering": "https://vidigal-code.github.io/cine-swipe/",
     "AiChatEnabled": true,
@@ -320,6 +378,11 @@
       "enabled": false,
       "publicKey": ""
     },
+    "supportedLanguages": [
+      "en",
+      "pt",
+      "es"
+    ],
     "langmenu": {
       "pt": {
         "pt": "Portugues",
@@ -666,161 +729,32 @@
         "sourceViewerEntryHint": "Explora los archivos de un repositorio sin abrir la documentacion.",
         "sourceViewerEntryAction": "Abrir el visor de codigo"
       }
-    },
-    "languages": {
-      "en": true,
-      "pt": true,
-      "es": true
-    },
-    "icons": {
-      "defaults": {
-        "reactIcon": true,
-        "colorDark": "White",
-        "colorLight": "black",
-        "size": "25px",
-        "imgDark": "",
-        "imgLight": "",
-        "imgWidth": 20,
-        "imgHeight": 20
-      },
-      "ImageMenuHeader": {
-        "tag": "FaGithubAlt"
-      },
-      "ProjectLink": {
-        "tag": "FaGithubAlt",
-        "size": null
-      },
-      "VersionLinks": {
-        "tag": "FaCodeBranch"
-      },
-      "InfoHeaderMenu": {
-        "tag": "BsInfoSquareFill"
-      },
-      "PreviewProjectLink": {
-        "tag": "CiGlobe"
-      },
-      "NavMenuOpen": {
-        "tag": "FaBars"
-      },
-      "NavMenuClose": {
-        "tag": "IoMdClose"
-      },
-      "NavMenuMobileOpen": {
-        "tag": "FaBars"
-      },
-      "NavMenuMobileClose": {
-        "tag": "IoMdClose"
-      },
-      "NavMenuBlockActive": {
-        "tag": "FiLock"
-      },
-      "NavMenuBlockInactive": {
-        "tag": "FiUnlock"
-      },
-      "DocsLock": {
-        "tag": "FiLock",
-        "size": "22px"
-      },
-      "AudioPlay": {
-        "tag": "CiPlay1",
-        "imgDark": null,
-        "imgLight": null,
-        "imgWidth": null,
-        "imgHeight": null
-      },
-      "AudioPause": {
-        "tag": "FaPause",
-        "imgDark": null,
-        "imgLight": null,
-        "imgWidth": null,
-        "imgHeight": null
-      },
-      "AudioPlayerPopoverClose": {
-        "tag": "IoMdClose"
-      },
-      "AudioPlayerPopoverPlay": {
-        "tag": "CiPlay1"
-      },
-      "AudioPlayerPopoverPause": {
-        "tag": "FaPause"
-      },
-      "AudioPlayerPopoverRestart": {
-        "tag": "FiRefreshCw"
-      },
-      "AudioPlayerPopoverLoopOn": {
-        "tag": "FiRepeat"
-      },
-      "AudioPlayerPopoverLoopOff": {
-        "tag": "FiRepeat"
-      },
-      "AiChatOpen": {
-        "tag": "BsRobot",
-        "size": "22px"
-      },
-      "AiChatClose": {
-        "tag": "IoMdClose",
-        "size": "22px"
-      },
-      "AiChatSettings": {
-        "tag": "FiSettings",
-        "size": "20px"
-      },
-      "AiChatSend": {
-        "tag": "FiSend",
-        "size": "20px"
-      },
-      "AiChatCancel": {
-        "tag": "FiXCircle",
-        "size": "20px"
-      },
-      "AiChatTrash": {
-        "tag": "FiTrash2",
-        "size": "20px"
-      },
-      "AiChatClearChat": {
-        "tag": "FiMessageSquare",
-        "size": "20px"
-      },
-      "AiChatClearData": {
-        "tag": "FiDatabase",
-        "size": "20px"
-      },
-      "AiChatExpand": {
-        "tag": "FiMaximize2",
-        "size": "20px"
-      },
-      "AiChatCollapse": {
-        "tag": "FiMinimize2",
-        "size": "20px"
-      },
-      "SidebarCollapse": {
-        "tag": "FiChevronsLeft",
-        "size": "22px"
-      },
-      "SidebarExpand": {
-        "tag": "FiChevronsRight",
-        "size": "22px"
-      }
-    },
-    "mediaExclusivePlayback": true,
-    "AiChatAutoLockSeconds": 30,
-    "layoutsConfigPath": "",
-    "layoutsConfigPathTemplates": ""
+    }
   },
   "VersionControl": {
     "versions": [
       {
         "id": "1.0.0",
         "path": "gitpagedocs/docs/versions/1.0.0/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/cine-swipe",
+        "ProjectLink": "https://github.com/Vidigal-code/cine-swipe",
         "PathConfig": "gitpagedocs/docs/versions/1.0.0/config.json",
         "PreviewProject": "",
-        "UpdateDate": "2026-08-18",
-        "branch": "main",
-        "release": "",
-        "commit": "",
+        "UpdateDate": "2026-10-29",
+        "branch": [
+          {
+            "name": "main",
+            "url": "https://github.com/Vidigal-code/cine-swipe/tree/main"
+          }
+        ],
+        "release": [],
+        "commit": [
+          {
+            "name": "e169e2b03d50",
+            "url": "https://github.com/Vidigal-code/cine-swipe/commit/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614"
+          }
+        ],
         "source-viewer": true,
-        "source-viewer-path": "https://github.com/vidigal-code/cine-swipe/tree/HEAD"
+        "source-viewer-path": "https://github.com/Vidigal-code/cine-swipe/tree/main"
       }
     ]
   },

@@ -1,58 +1,60 @@
 # Visão geral do projeto
 
-CineSwipe é um catálogo e loja de filmes fullstack. Usuários navegam por um catálogo público, assistem trailers, compram filmes e gerenciam uma carteira de créditos; administradores gerenciam filmes, usuários, planos de créditos e auditoria de pagamentos.
+Catálogo de filmes com autenticação, perfil, administração, compra de filmes, carteira de créditos e indicações. Compra de filme cobra seu preço em dinheiro; não desconta a carteira. Créditos têm checkout e consumo próprios. Os modos mock e Stripe precisam ser distinguidos ao interpretar uma compra aprovada.
 
-## Stack
+## Comportamento implementado
 
-| Camada | Tecnologias |
-|---|---|
-| Frontend | Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS 3.4, Redux Toolkit, TanStack React Query 5, axios, next-themes |
-| Backend | NestJS 11, Prisma 6, PostgreSQL, RabbitMQ (`@nestjs/microservices`), Stripe 19, firebase-admin 13, JWT + JWE (jose), bcrypt, helmet, nestjs-pino |
-| Infra | Docker Compose (postgres, rabbitmq, backend, frontend), Railway (deploy) |
+Backend TypeScript/NestJS 11 com Prisma 6.7/PostgreSQL, RabbitMQ, Firebase Admin e Stripe. Domain contém entidades/portas; application contém serviços; infrastructure contém repositórios, autenticação, gateways e mensageria; presentation expõe controllers/workers. Frontend Next.js 14.2.35, React 18, Redux Toolkit e TanStack Query 5. Modos local/firebase/hybrid selecionam autenticação; a configuração de plataforma seleciona persistência e processamento.
 
-## Estrutura do repositório
+```mermaid
+flowchart LR
+  Web[Next.js] --> API[NestJS]
+  API --> Purchase[Purchase and outbox]
+  Purchase --> Dispatcher[Dispatcher]
+  Dispatcher --> RMQ[RabbitMQ]
+  RMQ --> Worker[Payment or credit worker]
+  Worker --> Gateway[Mock or Stripe]
+  Gateway --> Webhook[Signed webhook]
+  Webhook --> Ledger[Status, audit and credit ledger]
+```
 
-| Caminho | Conteúdo |
-|---|---|
-| `backend/` | API NestJS: `src/`, `prisma/` (schema, migrações, seed), `tests/e2e/`, `Dockerfile`, `railway.toml` |
-| `frontend/` | UI Next.js: `src/` em arquitetura FSD, `Dockerfile`, `railway.toml` |
-| `docker-compose.yml` | Orquestração local dos 4 serviços |
-| `envexample.txt` | Template de ambiente para execução local |
-| `docs/deploy/` | Runbook do Railway e template de ambiente de produção |
+## Fluxo e casos de falha
 
-## Arquitetura do backend
+1. Cadastro/login valida credenciais locais ou token Firebase e cria sessão. Cookies de acesso/refresh são HttpOnly; o cookie CSRF é legível pelo cliente e acompanha x-csrf-token conforme configuração. Refresh, logout, alteração de senha/perfil e avatar possuem endpoints próprios. A lista e o detalhe de filmes alimentam a navegação e o checkout.
 
-O backend segue camadas inspiradas em Clean Architecture em `backend/src/`:
+2. POST /payments/checkout recebe movieId e gera correlationId. No modo rmq, o repositório cria Purchase PENDING e outbox; no adaptador Prisma, ambos são gravados em transação. Dispatcher publica checkout.requested; worker chama o gateway, atualiza COMPLETED/FAILED e registra auditoria. Timeout, tentativas e DLQ são configuráveis. No modo sync, o gateway é chamado dentro da requisição.
 
-- `domain/` — entidades e interfaces de repositório (`user`, `movie`, `payment`, `credit`)
-- `application/` — serviços de caso de uso (`auth`, `admin-user`, `movie`, `payment`, `credit`, `media`)
-- `infrastructure/` — repositórios Prisma e Firebase, guards de autenticação, gateways de pagamento, clientes RabbitMQ
-- `presentation/` — controllers HTTP, DTOs e workers/dispatchers RMQ
-- `shared/` — cookies, CSP, CORS, paginação, fábrica de respostas, logger, segurança de upload, catálogos de mensagens em pt-BR
-- `modules/` — wiring dos módulos Nest
+3. Webhook /payments/webhook/stripe valida assinatura usando o corpo bruto e STRIPE_WEBHOOK_SECRET. Eventos já processados são reconhecidos; payment_intent.succeeded/failed atualizam compras. purchaseKind direciona créditos. correlationId fornece chave de idempotência ao gateway; evento processado e ledger possuem controles adicionais. Inspecione cada adaptador antes de assumir a mesma atomicidade fora do Prisma.
 
-## Arquitetura do frontend
+4. Planos de créditos → /credits/checkout → outbox/worker próprios → aprovação → ledger e saldo. /credits/consume aplica débito e rejeita saldo insuficiente. Cadastro pode conceder bônus base e bônus por indicação. A primeira compra de créditos aprovada do indicado pode recompensar o indicador; configuração, correlações e logs de recompensa evitam repetir o benefício no fluxo previsto. Admins gerenciam usuários, planos/configuração e auditoria.
 
-O frontend usa Feature-Sliced Design (FSD) em `frontend/src/`: `app` (rotas e providers), `widgets`, `features`, `entities` e `shared`. Redux guarda apenas o estado de autenticação; todos os dados do servidor vivem no React Query.
+## Configuração e implantação
 
-## Provedores plugáveis
+Copie envexample.txt para .env e use docker compose up --build; Compose publica frontend 3000 e backend 3001, além de PostgreSQL e RabbitMQ. Execute prisma:generate/migrate conforme o ambiente; migrate:deploy aplica migrations existentes, e seed deve ser revisado antes de uso em dados reais. Backend oferece build, test e test:e2e; frontend oferece build/lint. Para compras PENDING, confira outbox, broker, worker e modo; para 401/403, cookies/CSRF; para webhook rejeitado, assinatura/corpo bruto. A documentação existente de pagamentos detalha variáveis e estados.
 
-Uma característica central: cada dependência externa tem implementações alternativas selecionadas por variável de ambiente:
+## Comandos de execução
 
-| Variável | Opções | Efeito |
-|---|---|---|
-| `DATABASE_PROVIDER` | `postgres` (padrão), `firestore`, `realtime` | Repositórios Prisma ou Firebase (estado JSON único em `cineswipe_state`) |
-| `AUTH_MODE` | `local` (padrão), `firebase`, `hybrid` | Senha local, token Firebase, ou ambos |
-| `MEDIA_STORAGE_PROVIDER` | `local` (padrão), `firebase` | Uploads em disco (`/uploads/`) ou Firebase Storage |
-| `PAYMENT_FLOW_MODE` | `rmq` (padrão), `sync` | Checkout assíncrono via outbox + fila, ou inline |
-| `PAYMENT_PROVIDER` | `mock` (padrão), `stripe` | Gateway simulado ou Stripe real |
+```sh
+docker compose up --build
+# Validation in a separately configured test environment
+npm --prefix backend ci
+npm --prefix backend run test
+npm --prefix backend run build
+npm --prefix frontend ci
+npm --prefix frontend run build
+```
 
-## Decisões de design notáveis
+## Arquivos relacionados
 
-- **Trailer por URL**: filmes armazenam `trailerUrl` do YouTube; o player converte qualquer formato de link do YouTube em embed, com fallback após 6 segundos.
-- **Sessão por cookies HttpOnly**: access token JWT + refresh token JWE + cookie CSRF de double-submit; nada de token em localStorage.
-- **Idempotência em três camadas** no fluxo de pagamento: `idempotencyKey` no Stripe, tabela `processed_webhook_events` e constraint única `(userId, correlationId)` no ledger de créditos.
-- **Auditoria imutável**: cada evento de pagamento gera uma linha em `payment_audits` com snapshot desnormalizado.
-- Todo o texto da interface é em pt-BR, mantido em arquivos de constantes (sem biblioteca de i18n).
+- [backend/src/application/payment/payment.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/payment/payment.service.ts)
+- [backend/src/application/credit/credit.service.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/application/credit/credit.service.ts)
+- [backend/src/presentation/workers/payment-outbox.dispatcher.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment-outbox.dispatcher.ts)
+- [backend/src/presentation/workers/payment.worker.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/presentation/workers/payment.worker.ts)
+- [backend/src/shared/config/platform.config.ts](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/src/shared/config/platform.config.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-> Versão: 1.0.0
+## Navegação
+
+- [Project guide](?menu=pt&lang=pt&id=9)
+- [Source reference](?menu=pt&lang=pt&id=10)

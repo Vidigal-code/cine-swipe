@@ -32,6 +32,34 @@
   },
   "routes-md": [
     {
+      "id": 9,
+      "title": {
+        "pt": "Contexto e fluxos do projeto",
+        "en": "Project context and workflows",
+        "es": "Contexto y flujos del proyecto"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
+      "id": 10,
+      "title": {
+        "pt": "Referência do código",
+        "en": "Source reference",
+        "es": "Referencia del código"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
       "id": 1,
       "title": {
         "pt": "Primeiros passos",
@@ -39,9 +67,9 @@
         "es": "Primeros pasos"
       },
       "description": {
-        "pt": "Instale e rode o CineSwipe localmente",
-        "en": "Install and run CineSwipe locally",
-        "es": "Instala y ejecuta CineSwipe localmente"
+        "pt": "Primeiros passos",
+        "en": "Getting Started",
+        "es": "Primeros pasos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -76,9 +104,9 @@
         "es": "Visión general del proyecto"
       },
       "description": {
-        "pt": "O que é o CineSwipe, stack e estrutura do repositório",
-        "en": "What CineSwipe is, stack and repository structure",
-        "es": "Qué es CineSwipe, stack y estructura del repositorio"
+        "pt": "Visão geral do projeto",
+        "en": "Project overview",
+        "es": "Visión general del proyecto"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -113,9 +141,9 @@
         "es": "Frontend"
       },
       "description": {
-        "pt": "Telas, experiência de swipe e integração com a API",
-        "en": "Screens, swipe experience and API integration",
-        "es": "Pantallas, experiencia de swipe e integración con la API"
+        "pt": "Frontend",
+        "en": "Frontend",
+        "es": "Frontend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -150,9 +178,9 @@
         "es": "Backend y API"
       },
       "description": {
-        "pt": "Arquitetura, módulos e endpoints da API NestJS",
-        "en": "Architecture, modules and NestJS API endpoints",
-        "es": "Arquitectura, módulos y endpoints de la API NestJS"
+        "pt": "Backend e API",
+        "en": "Backend and API",
+        "es": "Backend y API"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -187,9 +215,9 @@
         "es": "Pagos y créditos"
       },
       "description": {
-        "pt": "Stripe, webhooks, outbox e sistema de créditos",
-        "en": "Stripe, webhooks, outbox and the credit system",
-        "es": "Stripe, webhooks, outbox y el sistema de créditos"
+        "pt": "Pagamentos e créditos",
+        "en": "Payments and credits",
+        "es": "Pagos y créditos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -224,9 +252,9 @@
         "es": "Configuración"
       },
       "description": {
-        "pt": "Variáveis de ambiente e integrações externas",
-        "en": "Environment variables and external integrations",
-        "es": "Variables de entorno e integraciones externas"
+        "pt": "Configuração",
+        "en": "Configuration",
+        "es": "Configuración"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -261,9 +289,9 @@
         "es": "Despliegue"
       },
       "description": {
-        "pt": "Docker, Railway, migrações e seed",
-        "en": "Docker, Railway, migrations and seed",
-        "es": "Docker, Railway, migraciones y seed"
+        "pt": "Deploy",
+        "en": "Deployment",
+        "es": "Despliegue"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -324,13 +352,43 @@
       "RouteguideBrandPosition": "center",
       "RouteguideBrandContainerTop": false,
       "source-viewer": true,
-      "source-viewer-path": "https://github.com/vidigal-code/cine-swipe/tree/HEAD"
+      "source-viewer-path": "https://github.com/Vidigal-code/cine-swipe/tree/main"
     }
   ],
   "routes-html": [],
   "routes-video": [],
   "routes-audio": [],
   "menus-header-md": [
+    {
+      "id": 9,
+      "pt": {
+        "title": "Contexto e fluxos do projeto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md"
+      },
+      "en": {
+        "title": "Project context and workflows",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md"
+      },
+      "es": {
+        "title": "Contexto y flujos del proyecto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      }
+    },
+    {
+      "id": 10,
+      "pt": {
+        "title": "Referência do código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md"
+      },
+      "en": {
+        "title": "Source reference",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md"
+      },
+      "es": {
+        "title": "Referencia del código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      }
+    },
     {
       "id": 1,
       "pt": {

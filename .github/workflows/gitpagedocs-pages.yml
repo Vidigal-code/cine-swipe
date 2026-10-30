@@ -41,7 +41,7 @@ jobs:
 
       - name: Prepare runtime source
         run: |
-          git clone --depth 1 https://github.com/Vidigal-code/git-page-docs.git .gitpagedocs-runtime
+          git clone --depth 1 --branch v0.0.17 https://github.com/Vidigal-code/git-page-docs.git .gitpagedocs-runtime
           cp .gitpagedocs-runtime/gitpagedocs/icon.svg /tmp/default-icon.svg 2>/dev/null || true
           if [ -d gitpagelayouts ]; then
             rm -rf .gitpagedocs-runtime/gitpagelayouts
@@ -51,13 +51,13 @@ jobs:
             rm -rf .gitpagedocs-runtime/gitpagedocs
             cp -R gitpagedocs .gitpagedocs-runtime/gitpagedocs
           fi
-          mkdir -p .gitpagedocs-runtime/public
+          mkdir -p .gitpagedocs-runtime/frontend/public
           if [ -f icon.svg ]; then
-            cp icon.svg .gitpagedocs-runtime/public/icon.svg
+            cp icon.svg .gitpagedocs-runtime/frontend/public/icon.svg
           elif [ -f gitpagedocs/icon.svg ]; then
-            cp gitpagedocs/icon.svg .gitpagedocs-runtime/public/icon.svg
+            cp gitpagedocs/icon.svg .gitpagedocs-runtime/frontend/public/icon.svg
           elif [ -f /tmp/default-icon.svg ]; then
-            cp /tmp/default-icon.svg .gitpagedocs-runtime/public/icon.svg
+            cp /tmp/default-icon.svg .gitpagedocs-runtime/frontend/public/icon.svg
           fi
 
       # This site is documentation-only. The runtime turns repository search on
