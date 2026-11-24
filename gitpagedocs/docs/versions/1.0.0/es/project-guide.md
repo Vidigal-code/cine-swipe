@@ -1,6 +1,6 @@
 # cine-swipe: Contexto y flujos del proyecto
 
-GitPageDocs **0.0.26** · 1.0.0 · 2026-11-08
+GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
 
 ## Contexto
 
@@ -60,9 +60,9 @@ Dependencias, comandos, endpoints, variables, contratos y pruebas están en la [
 
 - [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-## Navegación de la documentación con GitPageDocs 0.0.26
+## Navegación de la documentación con GitPageDocs 0.0.29
 
-Las opciones de esta sección requieren el runtime GitPageDocs **0.0.26**. La versión documental de este proyecto sigue siendo **1.0.0**. Actualizar texto y configuración no actualiza por sí solo el runtime publicado por el workflow.
+Esta guía describe el runtime GitPageDocs **0.0.29**. La versión documental de este proyecto sigue siendo **1.0.0**. Actualizar texto y configuración no actualiza por sí solo el runtime publicado por el workflow.
 
 ### Índice por etiquetas
 
@@ -97,3 +97,17 @@ Las dos entradas del catálogo de layouts deben habilitar `supportsLightAndDarkM
 ## Altura de la guía lateral de escritorio
 
 En pantallas de escritorio con más de 1024 píxeles CSS, la guía lateral termina después de su última entrada, sin extenderse hasta el final del artículo. Desde 0.0.25, puede crecer hasta la altura disponible de la ventana debajo de la cabecera antes de necesitar desplazamiento interno. Este diseño lateral tiene prioridad sobre `TocScrollMaxHeightDesktop`; la guía centrada encima del contenido y los diseños de hasta 1024 píxeles mantienen sus reglas de tamaño anteriores. Una pequeña barra con el color de la entrada activa sigue la sección marcada al desplazarse. El indicador utiliza el seguimiento de secciones existente, sin animación continua. En GitPageDocs 0.0.26, las guías laterales ganan 0.5rem adicionales de espacio debajo de la cabecera (8px con la fuente raíz predeterminada) y conservan 1rem debajo de la tarjeta en el límite de la ventana. Este ajuste se aplica solo por encima de 1024 píxeles CSS; los diseños menores se mantienen.
+
+## Desplazamiento de la guía y del código fuente
+
+Desde GitPageDocs 0.0.27, el visor Source code limita su área de contenido a la altura disponible de la ventana. Cuando esa pantalla está disponible, las listas largas y las vistas previas se desplazan dentro del contenedor. El workflow de este proyecto mantiene la redirección de la página independiente `source-viewer` a la documentación.
+
+Desde la 0.0.28, la guía mantiene 1.5rem entre las entradas y la barra de desplazamiento (24 píxeles CSS con la fuente raíz predeterminada). En Chromium/WebKit, la barra mide 4px, con pista transparente e indicador translúcido del color del tema. Los navegadores que no aplican este estilo utilizan barras finas nativas cuando son compatibles.
+
+## Controles dentro de Markdown
+
+En la 0.0.29, Anterior, Siguiente y Volver arriba están dentro de la tarjeta Markdown, después del contenido, con 8px de espacio en el flujo normal para no cubrir texto, tablas ni imágenes. `site.documentNavigation.position` sigue aceptando `"left"`, `"center"` y `"right"`; este proyecto conserva `"center"`.
+
+Los botones de icono siguen el estilo compacto de copiar y descargar: 36px en escritorio, con una altura táctil mínima de 44px en dispositivos de puntero impreciso, como teléfonos. Se conservan las etiquetas e iconos configurados, el foco por teclado y los límites deshabilitados de navegación. Volver arriba sigue respetando `site.backToTop.enabled` y `minPageHeightViewports`.
+
+El modo foco utiliza el ojo enmarcado `LuScanEye` en `site.icons.FocusMode.tag`. Este botón abre la lectura en foco; copiar, descargar, navegar y cerrar mantienen sus funciones. Las personalizaciones de color, tamaño, imagen y texto siguen disponibles.

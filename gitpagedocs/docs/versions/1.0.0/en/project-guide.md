@@ -1,6 +1,6 @@
 # cine-swipe: Project context and workflows
 
-GitPageDocs **0.0.26** · 1.0.0 · 2026-11-08
+GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
 
 ## Context
 
@@ -60,9 +60,9 @@ Dependencies, commands, endpoints, variables, contracts and tests are in the [so
 
 - [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-## Documentation navigation with GitPageDocs 0.0.26
+## Documentation navigation with GitPageDocs 0.0.29
 
-The options in this section require the GitPageDocs **0.0.26** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
+This guide describes the GitPageDocs **0.0.29** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
 
 ### Tag-based contents
 
@@ -97,3 +97,17 @@ Both entries in the layout catalog must enable `supportsLightAndDarkModes`, shar
 ## Desktop side-guide height
 
 On desktop screens wider than 1024 CSS pixels, the side guide ends after its last entry instead of stretching to the article height. Since 0.0.25, it can grow to the available viewport height below the header before its entries need internal scrolling. This side layout takes precedence over `TocScrollMaxHeightDesktop`; centered guides above the content and layouts at 1024 pixels and below retain their previous sizing rules. A small bar in the active entry's theme color follows the section marked while scrolling. The indicator uses the existing section tracking without continuous animation. In GitPageDocs 0.0.26, side guides have an extra 0.5rem of space below the header (8px at the default root font size) and retain 1rem below the card at the viewport limit. This adjustment applies only above 1024 CSS pixels; smaller layouts are unchanged.
+
+## Guide and source scrolling
+
+Since GitPageDocs 0.0.27, the Source code viewer limits its content area to the available viewport height. Where that screen is available, long file lists and previews scroll inside the container. This project workflow retains the redirect from the standalone `source-viewer` page to the documentation.
+
+Since 0.0.28, the guide keeps 1.5rem between its entries and the scrollbar (24 CSS pixels at the default root font size). Chromium/WebKit uses a 4px scrollbar with a transparent track and a translucent, theme-colored thumb. Browsers that do not apply this styling use native thin scrollbars when supported.
+
+## Controls inside Markdown
+
+In 0.0.29, Previous, Next and Back to top sit inside the Markdown card, after the content, with an 8px gap in normal flow so they do not cover text, tables or images. `site.documentNavigation.position` still accepts `"left"`, `"center"` and `"right"`; this project retains `"center"`.
+
+Icon buttons follow the compact copy and download controls: 36px on desktop, with a minimum touch height of 44px on coarse-pointer devices such as phones. Configured labels and icons, keyboard focus and disabled navigation boundaries are preserved. Back to top still follows `site.backToTop.enabled` and `minPageHeightViewports`.
+
+Focus mode uses the framed-eye icon `LuScanEye` in `site.icons.FocusMode.tag`. This button opens focused reading; copy, download, navigation and close retain their functions. Color, size, image and text overrides remain available.

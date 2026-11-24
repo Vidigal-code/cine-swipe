@@ -1,6 +1,6 @@
 # cine-swipe: Contexto e fluxos do projeto
 
-GitPageDocs **0.0.26** · 1.0.0 · 2026-11-08
+GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
 
 ## Contexto
 
@@ -60,9 +60,9 @@ Dependências, comandos, endpoints, variáveis, contratos e testes estão na [re
 
 - [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-## Navegação da documentação com GitPageDocs 0.0.26
+## Navegação da documentação com GitPageDocs 0.0.29
 
-As opções desta seção requerem o runtime GitPageDocs **0.0.26**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
+Este guia descreve o runtime GitPageDocs **0.0.29**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
 
 ### Índice por tags
 
@@ -97,3 +97,17 @@ As duas entradas do catálogo de layouts devem habilitar `supportsLightAndDarkMo
 ## Altura do guia lateral desktop
 
 Em telas desktop com mais de 1024 pixels CSS, o guia lateral termina após o último item, sem se estender até o fim do artigo. Desde a 0.0.25, ele pode crescer até a altura disponível da janela abaixo do cabeçalho antes de precisar de rolagem interna. Esse layout lateral tem prioridade sobre `TocScrollMaxHeightDesktop`; o guia centralizado acima do conteúdo e os layouts de até 1024 pixels mantêm suas regras anteriores de dimensionamento. Uma pequena barra na cor do item ativo acompanha a seção marcada durante a rolagem. O indicador usa o acompanhamento de seções existente, sem animação contínua. No GitPageDocs 0.0.26, os guias laterais ganham mais 0.5rem de espaço abaixo do cabeçalho (8px com a fonte raiz padrão) e mantêm 1rem abaixo do cartão no limite da viewport. Esse ajuste vale somente acima de 1024 pixels CSS; os layouts menores são preservados.
+
+## Rolagem do guia e do código-fonte
+
+Desde o GitPageDocs 0.0.27, o visualizador Source code limita sua área de conteúdo à altura disponível da janela. Quando essa tela está disponível, listas longas e prévias rolam dentro do contêiner. O workflow deste projeto mantém o redirecionamento da página independente `source-viewer` para a documentação.
+
+Desde a 0.0.28, o guia mantém 1.5rem entre as entradas e a barra de rolagem (24 pixels CSS com a fonte raiz padrão). Em Chromium/WebKit, a barra tem 4px, trilha transparente e indicador translúcido na cor do tema. Navegadores que não aplicam esse estilo usam a barra fina nativa quando suportada.
+
+## Controles dentro do Markdown
+
+Na 0.0.29, Anterior, Próximo e Subir ao topo ficam dentro do cartão Markdown, após o conteúdo, com 8px de espaço no fluxo normal para não cobrir textos, tabelas ou imagens. `site.documentNavigation.position` continua aceitando `"left"`, `"center"` e `"right"`; este projeto mantém `"center"`.
+
+Os botões de ícone seguem o padrão compacto de copiar e baixar: 36px no desktop, com altura mínima de toque de 44px em dispositivos de ponteiro impreciso, como celulares. Rótulos e ícones configurados, foco por teclado e limites desabilitados de navegação são preservados. Subir ao topo continua respeitando `site.backToTop.enabled` e `minPageHeightViewports`.
+
+O modo foco usa o olho enquadrado `LuScanEye` em `site.icons.FocusMode.tag`. Esse botão abre a leitura em foco; copiar, baixar, navegar e fechar mantêm suas funções. Personalizações de cor, tamanho, imagem e texto continuam disponíveis.

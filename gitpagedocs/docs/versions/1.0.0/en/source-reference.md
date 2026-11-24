@@ -2,7 +2,7 @@
 
 Inventory extracted from manifests and code declarations. Versions using `^` or `~` are declared ranges; the lockfile determines the resolved version.
 
-Commit: `e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614`. GitPageDocs: `0.0.26`.
+Commit: `e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614`. GitPageDocs: `0.0.29`.
 
 ## Dependencies and tooling
 
@@ -272,9 +272,9 @@ Names are extracted only from example files and environment references in source
 
 ## Documentation maintenance and local MCP
 
-The functional content above describes this project. Viewer configuration targets GitPageDocs **0.0.26**; it does not change the application version or the `1.0.0` documentation directory.
+The functional content above describes this project. Viewer configuration targets GitPageDocs **0.0.29**; it does not change the application version or the `1.0.0` documentation directory.
 
-With `@gitpagedocs/cli` 0.0.26 installed, run from this repository's root:
+With `@gitpagedocs/cli` 0.0.29 installed, run from this repository's root:
 
 ```sh
 gitpagedocs mcp start
