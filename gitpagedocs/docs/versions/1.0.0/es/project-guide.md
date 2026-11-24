@@ -1,6 +1,6 @@
 # cine-swipe: Contexto y flujos del proyecto
 
-GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
+GitPageDocs **0.0.30** · 1.0.0 · 2026-11-24
 
 ## Contexto
 
@@ -60,9 +60,9 @@ Dependencias, comandos, endpoints, variables, contratos y pruebas están en la [
 
 - [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-## Navegación de la documentación con GitPageDocs 0.0.29
+## Navegación de la documentación con GitPageDocs 0.0.30
 
-Esta guía describe el runtime GitPageDocs **0.0.29**. La versión documental de este proyecto sigue siendo **1.0.0**. Actualizar texto y configuración no actualiza por sí solo el runtime publicado por el workflow.
+Esta guía describe el runtime GitPageDocs **0.0.30**. La versión documental de este proyecto sigue siendo **1.0.0**. Actualizar texto y configuración no actualiza por sí solo el runtime publicado por el workflow.
 
 ### Índice por etiquetas
 
@@ -111,3 +111,11 @@ En la 0.0.29, Anterior, Siguiente y Volver arriba están dentro de la tarjeta Ma
 Los botones de icono siguen el estilo compacto de copiar y descargar: 36px en escritorio, con una altura táctil mínima de 44px en dispositivos de puntero impreciso, como teléfonos. Se conservan las etiquetas e iconos configurados, el foco por teclado y los límites deshabilitados de navegación. Volver arriba sigue respetando `site.backToTop.enabled` y `minPageHeightViewports`.
 
 El modo foco utiliza el ojo enmarcado `LuScanEye` en `site.icons.FocusMode.tag`. Este botón abre la lectura en foco; copiar, descargar, navegar y cerrar mantienen sus funciones. Las personalizaciones de color, tamaño, imagen y texto siguen disponibles.
+
+## Archivos de código fuente y navegación del árbol en GitPageDocs 0.0.30
+
+Desde 0.0.30, Código fuente reconoce archivos UTF-16LE y UTF-16BE por su marca de orden de bytes (BOM). El visor elimina la marca inicial y conserva acentos, texto de alfabetos no latinos y emoji. Los archivos sin BOM de UTF-16 siguen decodificándose como UTF-8, incluidos los archivos UTF-8 con BOM. Esto corrige la visualización de archivos como un `.gitignore` en UTF-16 sin modificar el archivo del repositorio.
+
+El árbol de archivos permite desplazarse horizontal y verticalmente y muestra los nombres completos de archivos y carpetas. Al hacer clic en la fila de una carpeta se expanden o contraen sus elementos sin sustituir el archivo abierto ni cambiar la dirección actual. La lista central, las rutas de navegación y los resultados filtrados de carpetas siguen permitiendo navegar por los directorios. Comprueba nombres largos y carpetas con varios niveles en ambas direcciones de desplazamiento; abrir y cerrar una carpeta repetidamente debe conservar el archivo seleccionado y la dirección.
+
+El visor no intenta adivinar la codificación de archivos UTF-16 sin BOM ni añade rutas de Código fuente automáticamente. Donde esté configurada esta vista, abre un `.gitignore` UTF-16 válido desde la lista de directorios y comprueba que `node_modules/` sea legible. Comprueba también nombres o contenidos de archivo con acentos, emoji y la vuelta al directorio en escritorio y móvil. La versión documental sigue siendo `1.0.0`.

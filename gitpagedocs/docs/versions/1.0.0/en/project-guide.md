@@ -1,6 +1,6 @@
 # cine-swipe: Project context and workflows
 
-GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
+GitPageDocs **0.0.30** · 1.0.0 · 2026-11-24
 
 ## Context
 
@@ -60,9 +60,9 @@ Dependencies, commands, endpoints, variables, contracts and tests are in the [so
 
 - [docker-compose.yml](https://github.com/Vidigal-code/cine-swipe/blob/e169e2b03d50a8a73eaf0d9f8a1e96c4ff8ab614/docker-compose.yml)
 
-## Documentation navigation with GitPageDocs 0.0.29
+## Documentation navigation with GitPageDocs 0.0.30
 
-This guide describes the GitPageDocs **0.0.29** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
+This guide describes the GitPageDocs **0.0.30** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
 
 ### Tag-based contents
 
@@ -111,3 +111,11 @@ In 0.0.29, Previous, Next and Back to top sit inside the Markdown card, after th
 Icon buttons follow the compact copy and download controls: 36px on desktop, with a minimum touch height of 44px on coarse-pointer devices such as phones. Configured labels and icons, keyboard focus and disabled navigation boundaries are preserved. Back to top still follows `site.backToTop.enabled` and `minPageHeightViewports`.
 
 Focus mode uses the framed-eye icon `LuScanEye` in `site.icons.FocusMode.tag`. This button opens focused reading; copy, download, navigation and close retain their functions. Color, size, image and text overrides remain available.
+
+## Source files and tree navigation in GitPageDocs 0.0.30
+
+Since 0.0.30, Source code recognizes UTF-16LE and UTF-16BE files by their byte-order mark (BOM). The viewer removes the initial mark and preserves accents, non-Latin text and emoji. Files without a UTF-16 BOM continue through UTF-8 decoding, including UTF-8 files with a BOM. This fixes displays such as a UTF-16 `.gitignore` without changing the repository file.
+
+The Files tree supports horizontal and vertical scrolling and displays complete file and folder names. Clicking a folder row expands or collapses its children without replacing the open file or changing the current URL. The central directory listing, breadcrumbs and filtered folder results continue to navigate directories. Check long names and deeply nested folders in both scroll directions; repeatedly opening and closing a folder must preserve the selected file and URL.
+
+The viewer does not guess the encoding of UTF-16 files without a BOM or add Source code routes automatically. Where this view is configured, open a valid UTF-16 `.gitignore` through the directory list and check that `node_modules/` is readable. Also check an accented filename or file content, emoji and navigation back to the directory on desktop and mobile. The documentation version remains `1.0.0`.

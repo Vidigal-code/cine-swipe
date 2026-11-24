@@ -1,10 +1,10 @@
 # cine-swipe documentation
 
-Documentation contract: **GitPageDocs 0.0.29**. Application documentation version: **1.0.0**.
+Documentation contract: **GitPageDocs 0.0.30**. Application documentation version: **1.0.0**.
 
-The existing Pages workflow builds the viewer from tag `v0.0.29`; publishing requires a push or an explicit workflow dispatch.
+The existing Pages workflow builds the viewer from tag `v0.0.30`; publishing requires a push or an explicit workflow dispatch.
 
-The root configuration retains project identity, theme and version history. Official layout assets are pinned to `v0.0.29`. Markdown, route catalogs and interface strings remain in this folder.
+The root configuration retains project identity, theme and version history. Official layout assets are pinned to `v0.0.30`. Markdown, route catalogs and interface strings remain in this folder.
 
 ## Reading and editing
 
@@ -18,12 +18,12 @@ The root configuration retains project identity, theme and version history. Offi
 Node.js 20 or later. Inspect the exact CLI version without regenerating project content:
 
 ```sh
-npx --yes --package @gitpagedocs/cli@0.0.29 gitpagedocs version
+npx --yes --package @gitpagedocs/cli@0.0.30 gitpagedocs version
 ```
 
 The generic scaffold is a template, not an updater for project-specific prose. Review and merge defaults explicitly. `--push`, `deploy` and `pages deploy` publish changes and are outside this local editing workflow.
 
-Runtime documentation: [GitPageDocs v0.0.29](https://github.com/Vidigal-code/git-page-docs/blob/v0.0.29/cli/README.md).
+Runtime documentation: [GitPageDocs v0.0.30](https://github.com/Vidigal-code/git-page-docs/blob/v0.0.30/cli/README.md).
 
 ## Fixed theme family and light/dark mode
 
