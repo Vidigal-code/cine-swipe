@@ -169,7 +169,14 @@
     "docsAccessBlockPopupTitle": "Bloquear a documentação?",
     "docsAccessBlockPopupDesc": "Você precisará da senha novamente na próxima visita.",
     "docsAccessBlockConfirmBtn": "Sim, bloquear",
-    "docsAccessBlockCancelBtn": "Cancelar"
+    "docsAccessBlockCancelBtn": "Cancelar",
+    "languageSelector": "Idioma",
+    "themeSelector": "Tema",
+    "sourceViewerFilesLabel": "Arquivos",
+    "sourceViewerPathLabel": "Caminho do repositório",
+    "sourceViewerNameLabel": "Nome",
+    "sourceViewerSizeLabel": "Tamanho",
+    "sourceViewerParentLabel": "Pasta anterior"
   },
   "translations": {
     "notFound": {

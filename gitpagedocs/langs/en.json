@@ -169,7 +169,14 @@
     "docsAccessBlockPopupTitle": "Block the documentation?",
     "docsAccessBlockPopupDesc": "You'll need the password again on your next visit.",
     "docsAccessBlockConfirmBtn": "Yes, block",
-    "docsAccessBlockCancelBtn": "Cancel"
+    "docsAccessBlockCancelBtn": "Cancel",
+    "languageSelector": "Language",
+    "themeSelector": "Theme",
+    "sourceViewerFilesLabel": "Files",
+    "sourceViewerPathLabel": "Repository path",
+    "sourceViewerNameLabel": "Name",
+    "sourceViewerSizeLabel": "Size",
+    "sourceViewerParentLabel": "Parent directory"
   },
   "translations": {
     "notFound": {
